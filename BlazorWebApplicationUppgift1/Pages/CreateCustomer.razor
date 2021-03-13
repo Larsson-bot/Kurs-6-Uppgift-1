@@ -1,0 +1,44 @@
+﻿@page "/create-customer"
+
+@inject IJSRuntime jsRuntime
+@inject HttpClient Http
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavManager
+
+
+<EditForm Model="customer" OnValidSubmit="CreateNewCustomer">
+    <DataAnnotationsValidator />
+    <div class="form-group col-10">
+        <input type="text" class="form-check" placeholder="FirstName" @bind="customer.FirstName" required />
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-check" placeholder="LastName" required @bind="customer.LastName" />
+    </div>
+    <div class="form-group">
+        <input type="email" class="form-check" placeholder="Email" required @bind="customer.Email" />
+    </div>
+    <button type="submit" class="btn btn-secondary align-items-center">Login</button>
+    <div id="adminCreateResponse"></div>
+</EditForm>
+@code {
+    private CustomerModel customer;
+
+    private async Task CreateNewCustomer()
+    {
+        Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+
+        var response = Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Administrators/create-customer", customer);
+        customer = new CustomerModel();
+        await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"Customer has been created");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+            customer = new CustomerModel();
+        
+      
+    }
+}

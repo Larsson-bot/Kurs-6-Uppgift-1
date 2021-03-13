@@ -1,0 +1,62 @@
+﻿@page "/create-admin"
+@inject HttpClient Http
+@inject IJSRuntime jsRuntime
+
+<EditForm Model="admin" OnValidSubmit="@CreateAdminAsync">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <input type="text" class="form-control" @bind="admin.FirstName" id="firstname" placeholder="FirstName" />
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" @bind="admin.LastName" placeholder="LastName" />
+    </div>
+    <div class="form-group">
+        <input type="email" class="form-control" @bind="admin.Email" placeholder="Email" />
+    </div>
+    <div class="form-group">
+        <input type="password" class="form-control" @bind="admin.Password" placeholder="Password" />
+    </div>
+    <div class="form-group">
+        <input type="password" class="form-control" @bind="admin.ConfirmPassword" placeholder="Confirm Password" />
+    </div>
+    <button type="submit" class="btn btn-success">Create Admin</button>
+    <div id="adminCreateResponse"></div>
+
+</EditForm>
+@code {
+    private CreateAdminModel admin;
+
+    private async Task CreateAdminAsync()
+    {
+        var response = await Http.PostAsJsonAsync<CreateAdminModel>("https://localhost:44384/api/Administrators/signup", admin);
+
+        @if (response.IsSuccessStatusCode)
+        {
+
+            await jsRuntime.InvokeVoidAsync(
+      "exampleJsFunctions.displayMessage",
+      $"{admin.FirstName} has been created");
+
+        }
+        else
+        {
+
+            await jsRuntime.InvokeVoidAsync(
+            "exampleJsFunctions.displayMessage",
+            "Theres an Admin in this system already!");
+        }
+
+
+
+    }
+
+
+
+    protected override void OnInitialized()
+    {
+        admin = new CreateAdminModel();
+    }
+
+}
+

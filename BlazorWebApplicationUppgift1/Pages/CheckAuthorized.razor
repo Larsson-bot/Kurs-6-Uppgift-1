@@ -1,0 +1,22 @@
+﻿@page "/check"
+@inject NavigationManager NavManager
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        var key = await sessionStorage.GetItemAsync<string>("AccessToken");
+        Console.WriteLine(key);
+        @if(key == null)
+        {
+            NavManager.NavigateTo("/unauthorized");
+        }
+        else
+        {
+            NavManager.NavigateTo("/create-customer");
+        }
+    }
+
+
+}
