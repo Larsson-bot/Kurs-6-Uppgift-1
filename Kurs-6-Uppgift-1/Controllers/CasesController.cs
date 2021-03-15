@@ -94,27 +94,77 @@ namespace Kurs_6_Uppgift_1.Controllers
         [HttpPost("create-case")]
         public async Task<IActionResult> CreateCase([FromBody] Case model)
         {
+            if (_context.Customers.Count() < model.CustomerId)
+            {
+                return new NotFoundObjectResult("Customer was not found.");
+            }
+
             if (await _identityService.CreateCaseAsync(model))
                 return new OkResult();
 
             return new BadRequestResult();
         }
 
-        // DELETE: api/Cases/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCase(int id)
+        [HttpGet("/getonstatus")]
+        public async Task<IActionResult> GetOnStatus(string status)
         {
-            var @case = await _context.Cases.FindAsync(id);
-            if (@case == null)
+            //var list = await _identityService.GetNewStatusCases(status);
+            var list = await _context.Cases.Where(x => x.Status == status).ToListAsync();
+            if (list.Count() != 0)
             {
-                return NotFound();
+
+                foreach (var @case in list)
+                {
+                    var customer = _context.Customers.FirstOrDefault(c => c.Id == @case.CustomerId);
+
+                    @case.Customer = customer;
+                }
+                return new OkObjectResult(list);
             }
-
-            _context.Cases.Remove(@case);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return new BadRequestObjectResult("No Cases found.");
         }
+
+        [HttpGet("/getoncustomerid")]
+        public async Task<IActionResult> GetCasesOnCustomerId(int id)
+        {
+            var list = await _context.Cases.Where(x => x.CustomerId == id).ToListAsync();
+            if (list.Count() != 0)
+            {
+
+                foreach (var @case in list)
+                {
+                    var customer = _context.Customers.FirstOrDefault(c => c.Id == @case.CustomerId);
+
+                    @case.Customer = customer;
+                }
+                return new OkObjectResult(list);
+            }
+            return new BadRequestObjectResult("No Cases found.");
+        }
+
+        [HttpGet("/getondate")]
+        public async Task<IActionResult> GetCasesOnSortedDate(string  dateinfo)
+        {
+
+            var list =  _context.Cases;
+
+            
+            list.OrderBy(d => d.Created);
+            if (list.Count() != 0)
+            {
+
+                foreach (var @case in list)
+                {
+                    var customer = _context.Customers.FirstOrDefault(c => c.Id == @case.CustomerId);
+
+                    @case.Customer = customer;
+                }
+                return new OkObjectResult(list);
+            }
+            return new BadRequestObjectResult("No Cases found.");
+        }
+
+
 
         private bool CaseExists(int id)
         {

@@ -96,8 +96,8 @@ namespace Kurs_6_Uppgift_1.Controllers
             //    updatedcase.Status = errand.Status;
             //}
      
-
     
+
 
 
             
@@ -124,17 +124,7 @@ namespace Kurs_6_Uppgift_1.Controllers
             return new UnauthorizedObjectResult("Unauthorized!");
       
         }
-        [AllowAnonymous]
-        [HttpGet("cases/getonstatus{status}")]
-        public async Task<IActionResult> GetOnStatus(string status)
-        {
-            var list = await _identityService.GetNewStatusCases(status);
-            if (list.Count() != 0)
-            {
-                return new OkObjectResult(list);
-            }
-            return new BadRequestObjectResult("No Cases found.");
-        }
+
 
         private RequestUser IdentityRequest()
         {

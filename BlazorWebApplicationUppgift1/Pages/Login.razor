@@ -1,54 +1,54 @@
 ﻿@page "/login"
-@inject HttpClient Http
-@inject NavigationManager NavManager
-@inject IJSRuntime jsRuntime
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inject Blazored.LocalStorage.ILocalStorageService localStorage
-<EditForm Model="loginAdmin" OnValidSubmit="SignInAsync">
-    <DataAnnotationsValidator />
-    <div class="form-group col-10">
-        <input type="email" class="form-check" placeholder="Email" @bind="loginAdmin.Email" required />
+
+
+    <div class="container">
+        <h3>LoginPage</h3>
+        <EditForm Model="loginAdmin" OnValidSubmit="SignInAsync">
+            <DataAnnotationsValidator />
+            <div class="row">
+                <div class="form-group  col-6">
+                    <input type="email" class="form-control" placeholder="Email" @bind="loginAdmin.Email" required />
+                </div>
+                <div class="form-group col-6">
+                    <input type="password" class="form-control" placeholder="Password" required @bind="loginAdmin.Password" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-secondary align-items-center">Login</button>
+            <div id="adminCreateResponse"></div>
+        </EditForm>
     </div>
-    <div class="form-group">
-        <input type="password" class="form-check" placeholder="Password" required @bind="loginAdmin.Password" />
-    </div>
-    <button type="submit" class="btn btn-secondary align-items-center">Login</button>
-    <div id="adminCreateResponse"></div>
-</EditForm>
 
-<h3>Login</h3>
 
-@code {
+    @code {
 
-    private LoginModel loginAdmin;
+        private LoginModel loginAdmin;
 
-    private async Task SignInAsync()
-    {
-        var response = await Http.PostAsJsonAsync<LoginModel>("https://localhost:44384/api/Administrators/signin", loginAdmin);
-
-        @if (response.IsSuccessStatusCode)
+        private async Task SignInAsync()
         {
-            var data = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
-            Console.WriteLine(data);
+            var response = await Http.PostAsJsonAsync<LoginModel>("https://localhost:44384/api/Administrators/signin", loginAdmin);
 
-            await sessionStorage.SetItemAsync("AccessToken", data.accessToken.ToString());
-            //await localStorage.SetItemAsync("AccessToken", data.accessToken.ToString());
-            NavManager.NavigateTo("/", true);
+            @if (response.IsSuccessStatusCode)
+            {
+                var data = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+                Console.WriteLine(data);
+
+                await sessionStorage.SetItemAsync("AccessToken", data.accessToken.ToString());
+                NavManager.NavigateTo("/", true);
+            }
+            else
+            {
+
+                await jsRuntime.InvokeVoidAsync(
+                "exampleJsFunctions.displayMessage",
+                "Invalid Email or Password");
+            }
         }
-        else
-        {
 
-            await jsRuntime.InvokeVoidAsync(
-            "exampleJsFunctions.displayMessage",
-            "Invalid Email or Password");
+
+
+        protected override void OnInitialized()
+        {
+            loginAdmin = new LoginModel();
+            //localStorage.RemoveItemAsync("AccessToken");
         }
     }
-
-
-
-    protected override void OnInitialized()
-    {
-        loginAdmin = new LoginModel();
-        //localStorage.RemoveItemAsync("AccessToken");
-    }
-}

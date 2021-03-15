@@ -16,7 +16,7 @@ namespace Kurs_6_Uppgift_1.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("ProductVersion", "5.0.4")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Kurs_6_Uppgift_1.Data.Case", b =>
@@ -42,7 +42,6 @@ namespace Kurs_6_Uppgift_1.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");

@@ -1,0 +1,38 @@
+﻿@page "/specfic-case"
+
+@inject HttpClient Http
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+<div class="container">
+    <form onsubmit="GetCasesOnCustomerIdAsync">
+        <div class="form-group">
+            <input type="text" class="form-check" placeholder="Specific Value" id="request" />
+        </div>
+        <button onclick="">GetOnId</button>
+        <button>GetOnStatus</button>
+        <button>GetOnDate</button>
+    </form>
+    <h3>GetCasesOnSpecificAttributes</h3>
+
+
+</div>
+@code {
+    private IEnumerable<CreateCaseModel> caseModel;
+    private CreateCaseModel model;
+    private int currentValue;
+    public int CurrentValue { get; set; }
+
+    protected override void OnInitialized()
+    {
+        model = new CreateCaseModel();
+    }
+
+    private async Task GetCasesOnCustomerIdAsync()
+    {
+        Console.WriteLine(CurrentValue);
+        //Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        var url = $"https://localhost:44384/api/https://localhost:44384/getoncustomerid?id={CurrentValue}";
+        caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(url);
+        //Console.WriteLine(caseModel);
+        Console.WriteLine(url);
+    }
+}

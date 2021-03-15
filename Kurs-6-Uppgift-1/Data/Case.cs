@@ -28,7 +28,7 @@ namespace Kurs_6_Uppgift_1.Data
         
         public DateTime LatestChange { get; set; }
 
-        [Required]
+
         [Column(TypeName = "nvarchar(30)")]
         public string Status { get; set; }
 

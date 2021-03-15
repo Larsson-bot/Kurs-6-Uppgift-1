@@ -143,10 +143,7 @@ namespace Kurs_6_Uppgift_1.Services
                                     AccessToken = _accessToken,
                                     ExpireDate = expiresDate
                                 }
-                            };
-                            
-
-                            
+                            };          
                         }
                     }
                     catch 
@@ -168,15 +165,18 @@ namespace Kurs_6_Uppgift_1.Services
         public async Task<bool> CreateCaseAsync(Case model)
         {
             var date = DateTime.Now;
+
+        
+
             try
             {
                 var errand = new Case
                 {
-                    AdminstratorId = model.AdminstratorId,
+                    AdminstratorId = 1,
                     CustomerId = model.CustomerId,
                     Created = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second),
                     LatestChange = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second),
-                    Status = model.Status,
+                    Status = "Not Started",
                     Description = model.Description
 
                 };
@@ -253,7 +253,15 @@ namespace Kurs_6_Uppgift_1.Services
 
         public async Task<IEnumerable<Case>> GetNewStatusCases(string status)
         {
-            var list = await _context.Cases.Where(x => x.Status == status).ToListAsync();
+            var list = await _context.Cases.Include(x => x.Customer).Where(x => x.Status == status).ToListAsync();
+
+            foreach(var @case in list)
+            {
+                var customer =  _context.Customers.FirstOrDefault(c => c.Id == @case.CustomerId);
+
+                @case.Customer = customer;
+            }
+            _context.SaveChanges();
             return list;
         }
     }

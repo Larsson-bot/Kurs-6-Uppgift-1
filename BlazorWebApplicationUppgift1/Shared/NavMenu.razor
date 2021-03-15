@@ -1,6 +1,6 @@
 ﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-
+@inject HttpClient Http 
 
 <div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">BlazorWebApplicationUppgift1</a>
@@ -48,18 +48,34 @@
                 </NavLink>
             </li>
         }
+        @if (CaseView)
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="create-case">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span>Create Case
+                </NavLink>
+            </li>
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="get-cases">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span>Get Cases
+                </NavLink>
+            </li>
+        }
 
     </ul>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
+    private IEnumerable<CustomerModel> customers;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     public bool ShowLink { get; set; } = true;
 
     public bool AdminView { get; set; } = false;
+
+    public bool CaseView { get; set; } = false;
 
 
     private void ToggleNavMenu()
@@ -80,6 +96,16 @@
         {
             ShowLink = false;
             AdminView = true;
+            await CheckIfCustomersExist();
+        }
+    }
+
+    private async Task CheckIfCustomersExist()
+    {
+        customers = await Http.GetFromJsonAsync<IEnumerable<CustomerModel>>("https://localhost:44384/api/Customers");
+        @if(customers != null)
+        {
+            CaseView = true;
         }
     }
 

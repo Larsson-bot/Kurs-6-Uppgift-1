@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kurs-6-Uppgift-1", "Kurs-6-Uppgift-1\Kurs-6-Uppgift-1.csproj", "{2BE1918A-5ACB-4AA8-AF1F-7E0501ADD98B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{7AE9A171-31CA-43D8-9490-47022A6A856B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorWebApplicationUppgift1", "BlazorWebApplicationUppgift1\BlazorWebApplicationUppgift1.csproj", "{06BEDC0D-C676-4178-96E6-86E14094A917}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{2BE1918A-5ACB-4AA8-AF1F-7E0501ADD98B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2BE1918A-5ACB-4AA8-AF1F-7E0501ADD98B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2BE1918A-5ACB-4AA8-AF1F-7E0501ADD98B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7AE9A171-31CA-43D8-9490-47022A6A856B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7AE9A171-31CA-43D8-9490-47022A6A856B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7AE9A171-31CA-43D8-9490-47022A6A856B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7AE9A171-31CA-43D8-9490-47022A6A856B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06BEDC0D-C676-4178-96E6-86E14094A917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{06BEDC0D-C676-4178-96E6-86E14094A917}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06BEDC0D-C676-4178-96E6-86E14094A917}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,0 +1,69 @@
+﻿@page "/create-case"
+
+
+
+<h3>Create Case</h3>
+<div class="container">
+    <h3>LoginPage</h3>
+    <EditForm Model="caseModel"  OnValidSubmit="CreateNewCase">
+        <DataAnnotationsValidator />
+        <div class="row">
+            <div class="form-group  col-6">
+                <label for="customerid">CustomerId</label>
+                <input type="text" class="form-control" id="customerId" @bind="@caseModel.CustomerId" required />
+            </div>
+            <div class="form-group  col-6">
+                <label for="description">Description</label>
+                <input type="text" class="form-control" id="description" required @bind="@caseModel.Description"/>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-secondary align-items-center">Login</button>
+        <div id="adminCreateResponse"></div>
+    </EditForm>
+</div>
+
+
+@code {
+    private CreateCaseModel caseModel;
+    private async Task CreateNewCase()
+    {
+        Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+
+
+        var response = await Http.PostAsJsonAsync<CreateCaseModel>("https://localhost:44384/api/Cases/create-case", caseModel);
+
+
+
+        @if (response.StatusCode.ToString() == "404")
+        {
+            await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"CustomerId does not exist");
+        }
+        @if (response.IsSuccessStatusCode)
+        {
+
+            await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"Case has been created");
+
+            await Task.Delay(10000);
+            caseModel = new CreateCaseModel();
+        }
+
+        else
+        {
+            await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"Bad request");
+        }
+
+        }
+
+        protected override void OnInitialized()
+        {
+            caseModel = new CreateCaseModel();
+        }
+
+
+}

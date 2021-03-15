@@ -1,10 +1,6 @@
 ﻿@page "/create-customer"
 
-@inject IJSRuntime jsRuntime
-@inject HttpClient Http
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
-@inject NavigationManager NavManager
-
+<h1>Create Customer</h1>
 
 <EditForm Model="customer" OnValidSubmit="CreateNewCustomer">
     <DataAnnotationsValidator />
@@ -34,11 +30,9 @@
 "Customer has been created");
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-
             customer = new CustomerModel();
-        
-      
+            
     }
 }
