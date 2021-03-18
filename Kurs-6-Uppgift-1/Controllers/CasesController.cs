@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Kurs_6_Uppgift_1.Data;
 using Kurs_6_Uppgift_1.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Kurs_6_Uppgift_1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CasesController : ControllerBase
     {
         private readonly IIdentityService _identityService;
@@ -25,9 +27,10 @@ namespace Kurs_6_Uppgift_1.Controllers
 
         // GET: api/Cases
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Case>>> GetCases()
+        public async Task<IActionResult> GetCases()
         {
-            return await _context.Cases.ToListAsync();
+
+            return new OkObjectResult(await _identityService.GetCases());
         }
 
         // GET: api/Cases/5
@@ -58,17 +61,16 @@ namespace Kurs_6_Uppgift_1.Controllers
 
 
             var date = DateTime.Now;
-
-            var issue = _context.Cases.AsNoTracking().Where(x => x.Id == id).ToList();
-
-            foreach (var errand in issue)
-            {
-                updatedCase.AdminstratorId = errand.AdminstratorId;
-                updatedCase.Created = errand.Created;
-                updatedCase.CustomerId = errand.CustomerId;
-                updatedCase.LatestChange = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
-                updatedCase.Description = errand.Description;
-            }
+            updatedCase.LatestChange = DateTime.Now;
+            
+            //foreach (var errand in issue)
+            //{
+            //    updatedCase.AdminstratorId = errand.AdminstratorId;
+            //    updatedCase.Created = errand.Created;
+            //    updatedCase.CustomerId = errand.CustomerId;
+            //    updatedCase.LatestChange = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
+            //    updatedCase.Description = errand.Description;
+            //}
 
             _context.Entry(updatedCase).State = EntityState.Modified;
 
@@ -105,7 +107,7 @@ namespace Kurs_6_Uppgift_1.Controllers
             return new BadRequestResult();
         }
 
-        [HttpGet("/getonstatus")]
+        [HttpGet("getonstatus")]
         public async Task<IActionResult> GetOnStatus(string status)
         {
             //var list = await _identityService.GetNewStatusCases(status);
@@ -124,7 +126,7 @@ namespace Kurs_6_Uppgift_1.Controllers
             return new BadRequestObjectResult("No Cases found.");
         }
 
-        [HttpGet("/getoncustomerid")]
+        [HttpGet("getoncustomerid")]
         public async Task<IActionResult> GetCasesOnCustomerId(int id)
         {
             var list = await _context.Cases.Where(x => x.CustomerId == id).ToListAsync();
@@ -139,25 +141,37 @@ namespace Kurs_6_Uppgift_1.Controllers
                 }
                 return new OkObjectResult(list);
             }
-            return new BadRequestObjectResult("No Cases found.");
+            return new OkObjectResult(list);
         }
 
-        [HttpGet("/getondate")]
-        public async Task<IActionResult> GetCasesOnSortedDate(string  dateinfo)
+        [HttpGet("getondate")]
+        public async Task<IActionResult> GetCasesOnSortedDate(string ordervalue)
         {
 
-            var list =  _context.Cases;
+            var list =  await _context.Cases.ToListAsync();
 
-            
-            list.OrderBy(d => d.Created);
+           
+           
             if (list.Count() != 0)
             {
 
                 foreach (var @case in list)
                 {
-                    var customer = _context.Customers.FirstOrDefault(c => c.Id == @case.CustomerId);
+                    var customer = _context.Customers.AsNoTracking().FirstOrDefault(c => c.Id == @case.CustomerId);
 
                     @case.Customer = customer;
+                }
+
+                if (ordervalue.ToLower() == "latest")
+                {
+                    var anotherlist =  list.OrderByDescending(c => c.Created);
+                    return new OkObjectResult(anotherlist);
+                }
+
+                if (ordervalue.ToLower() == "oldest")
+                {
+                    var anotherlist= list.OrderBy(s => s.Created);
+                    return new OkObjectResult(anotherlist);
                 }
                 return new OkObjectResult(list);
             }

@@ -65,47 +65,18 @@ namespace Kurs_6_Uppgift_1.Controllers
             return new BadRequestObjectResult("Invalid Email or Password");
         }
 
-
-   
-
-
-        //[AllowAnonymous]
-        [HttpGet("get-cases")]
-        public async Task<IActionResult> GetCases()
+        [HttpGet("GetAdminInfo")]
+        public async Task<IActionResult> GetAdminAsync(int id)
         {
+            var admin = await _context.Users.FirstOrDefaultAsync();
+            if (admin != null)
+                return new OkObjectResult(admin);
 
-            return new OkObjectResult(await _identityService.GetCases());
+            return new BadRequestObjectResult("Invalid Email or Password");
         }
 
-        [AllowAnonymous]
-        [HttpPut("update-case{id}")]
-        public async Task<IActionResult> UpdateCase(int id, [FromBody]Case updatedcase) 
-        {
- 
-            //var date = new DateTime();
-            //var issue = _context.Cases.AsNoTracking().Where(x => x.Id == id).ToList();
-
-            //foreach (var errand in issue)
-            //{
-            //    updatedcase.Id = id;
-            //    //updatedcase.AdminstratorId = errand.AdminstratorId;
-            //    updatedcase.Created = errand.Created;
-            //    //updatedcase.CustomerId = errand.CustomerId;
-            //    updatedcase.LatestChange = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
-            //    updatedcase.Description = errand.Description;
-            //    updatedcase.Status = errand.Status;
-            //}
-     
-    
 
 
-
-            
-            _context.Entry(updatedcase).State = EntityState.Modified;
-    
-            await _context.SaveChangesAsync();
-            return new OkResult();
-        }
 
         [AllowAnonymous]
         [HttpGet("customer/{id}")]
@@ -128,9 +99,6 @@ namespace Kurs_6_Uppgift_1.Controllers
 
         private RequestUser IdentityRequest()
         {
-            //HttpContext.Request.Headers.TryGetValue("UserId", out var _userId);
-            //HttpContext.Request.Headers.TryGetValue("AccessToken", out var _accessToken);
-
             try
             {
                 var user =  new RequestUser

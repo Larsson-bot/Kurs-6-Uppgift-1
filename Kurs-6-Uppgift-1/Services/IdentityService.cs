@@ -120,7 +120,7 @@ namespace Kurs_6_Uppgift_1.Services
                             var tokenHandler = new JwtSecurityTokenHandler();
 
                             
-                            var expiresDate = DateTime.Now.AddMinutes(5);
+                            var expiresDate = DateTime.Now.AddHours(5);
 
                             var _secretKey = Encoding.UTF8.GetBytes(Configuration.GetSection("SecretKey").Value);
                             var tokenDescriptor = new SecurityTokenDescriptor
@@ -261,7 +261,6 @@ namespace Kurs_6_Uppgift_1.Services
 
                 @case.Customer = customer;
             }
-            _context.SaveChanges();
             return list;
         }
     }

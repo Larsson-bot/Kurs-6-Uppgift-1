@@ -6,12 +6,61 @@
     </div>
 
     <div class="main">
-        <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-        </div>
+        @if (FirstView)
+        {
+            <div class="top-row px-4">
+                <NavLink class="nav-link" href="login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span aria-hidden="true"></span>login
+
+                </NavLink>
+            </div>
+        }
+        @if (LoginView)
+        {<div class="top-row px-4">
+    <div>Welcome @admin.FirstName!</div>
+    <NavLink class="nav-link" href="logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span  aria-hidden="true"></span>Logout
+    </NavLink>
+</div>
+         
+        }
 
         <div class="content px-4">
             @Body
         </div>
     </div>
 </div>
+
+
+@code{
+    public bool LoginView { get; set; } = false;
+    public bool FirstView { get; set; } = true;
+    private CreateAdminModel admin;
+
+    private async Task GetAdmin()
+    {
+
+        Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        admin = await Http.GetFromJsonAsync<CreateAdminModel>("https://localhost:44384/api/Administrators/GetAdminInfo");
+    }
+
+    private async Task TokenExistAsync()
+    {
+
+        var token = await sessionStorage.GetItemAsync<string>("AccessToken");
+        @if (token != null)
+        {
+            FirstView = false;
+            LoginView = true;
+            await GetAdmin();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TokenExistAsync();
+    }
+
+}

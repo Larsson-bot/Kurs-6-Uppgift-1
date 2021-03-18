@@ -25,5 +25,7 @@ namespace BlazorWebApplicationUppgift1.Models
         
         public virtual CustomerModel Customer { get; set; }
 
+        public bool IsEditing { get; set; }
+
     }
 }

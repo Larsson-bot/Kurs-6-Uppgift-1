@@ -21,8 +21,10 @@
 
     private async Task CreateNewCustomer()
     {
-        Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-
+        if (!Http.DefaultRequestHeaders.Any())
+        {
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        }
         var response = Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Administrators/create-customer", customer);
         customer = new CustomerModel();
         await jsRuntime.InvokeVoidAsync(
@@ -32,7 +34,7 @@
 
     protected override void OnInitialized()
     {
-            customer = new CustomerModel();
-            
+        customer = new CustomerModel();
+
     }
 }

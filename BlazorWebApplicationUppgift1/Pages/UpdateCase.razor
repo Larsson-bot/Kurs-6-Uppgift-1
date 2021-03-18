@@ -1,0 +1,130 @@
+﻿@page "/update-case"
+
+<h3>UpdateCase</h3>
+
+<h1>Cases</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (caseModel == null)
+{
+    <p><em>Loading...</em></p>
+}
+
+else
+{ 
+
+
+
+<table class="table">
+    <tr>
+        <th>Id</th>
+        <th>Customer</th>
+        <th>AdminId</th>
+        <th>Description</th>
+        <th>Created</th>
+        <th>Last Changed</th>
+        <th>Status</th>
+    </tr>
+    @foreach (var item in caseModel)
+    {
+
+        if (@item.IsEditing)
+        {
+            <tr>
+                <td>
+                    <input type="text" class="form-control" disabled="disabled"  value="@item.Id" />
+                </td>
+                <td>
+                    <input type="text" class="form-control" value="@item.Customer.DisplayName" disabled="disabled" />
+                </td>
+                <td>
+                    <input type="text" class="form-control" disabled="disabled" value="@item.AdminstratorId" />
+                </td>
+                <td>
+                    <input type="text" class="form-control" value="@item.Description" disabled="disabled"/>
+                </td>
+                <td>
+                    <input type="text" class="form-control" value="@item.Created" disabled="disabled"/>
+                </td>
+                <td>
+                    <input type="text" class="form-control" value="@item.LatestChange" disabled="disabled"/>
+                </td>
+                <td>
+                    <select @bind="item.Status" required>
+                        <option value="Not Started">Not Started</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-link" @onclick="() => EnableEditing(false, item)">
+                        <i class="fas fa-window-close" />
+                    </button>
+                    <button type="button" class="btn btn-link" @onclick="() => UpdateInstance(item)">
+                        <i class="fas fa-check-square" />
+                    </button>
+                </td>
+            </tr>
+
+        }
+        else
+        {
+
+<tr>
+    <td>@item.Id</td>
+    <td>@item.Customer.DisplayName</td>
+    <td>@item.AdminstratorId</td>
+    <td>@item.Description</td>
+    <td>@item.Created</td>
+    <td>@item.LatestChange</td>
+    <td>@item.Status</td>
+    <td>
+        <button type="button" class="btn btn-link" @onclick="() => EnableEditing(true, item)">
+            <i class="fas fa-pen" />
+        </button>
+    </td>
+</tr>
+        }
+
+    }
+</table>
+}
+@code {
+    private IEnumerable<CreateCaseModel> caseModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCasesAsync();
+    }
+
+    private async Task GetCasesAsync()
+    {
+        if (!Http.DefaultRequestHeaders.Any())
+        {
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        }
+
+        caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
+
+    }
+
+    private async Task EnableEditing(bool flag, CreateCaseModel instanceData)
+    {
+        instanceData.IsEditing = flag;
+        if(flag == false)
+        {
+            caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
+        }
+    }
+
+    private async Task UpdateInstance(CreateCaseModel instanceData)
+    {
+        await EnableEditing(false, instanceData);
+        var response = await Http.PutAsJsonAsync<CreateCaseModel>($"https://localhost:44384/api/Cases/{instanceData.Id}", instanceData );
+        caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
+        Console.WriteLine(response);
+        //call the repository to update the instance here.
+        //show toast after done.
+    }
+}

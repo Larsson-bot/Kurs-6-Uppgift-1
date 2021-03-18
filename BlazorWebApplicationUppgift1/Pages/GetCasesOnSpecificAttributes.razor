@@ -1,38 +1,162 @@
 ﻿@page "/specfic-case"
 
-@inject HttpClient Http
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+<h3>GetCasesOnSpecificAttributes</h3>
 <div class="container">
-    <form onsubmit="GetCasesOnCustomerIdAsync">
+    <EditForm Model="currentValue" OnSubmit="GetCasesOnSpecficRequestAsync">
         <div class="form-group">
-            <input type="text" class="form-check" placeholder="Specific Value" id="request" />
+            <input type="text" class="form-check" placeholder="Specific Value" @bind="currentValue.ValueFromUser" required />
         </div>
-        <button onclick="">GetOnId</button>
-        <button>GetOnStatus</button>
-        <button>GetOnDate</button>
-    </form>
-    <h3>GetCasesOnSpecificAttributes</h3>
+        <div class="form-group">
+            <select @bind="currentValue.RequestFromUser" required>
+                <option>--Select Request--</option>
+                <option value="GetOnId">GetOnId</option>
+                <option value="GetOnStatus">GetOnStatus</option>
+                <option value="GetOnDate">GetOnDate</option>
+            </select>
+            <div id="adminCreateResponse"></div>
+        </div>
+        <button>Request Data From Api</button>
+    </EditForm>
 
-
+    @if (caseModel == null)
+    {
+        <div>No cases has been found.</div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>AdminId</th>
+                    <th>CustomerId</th>
+                    <th>Customer</th>
+                    <th>Created</th>
+                    <th>Last Changed</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in caseModel)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.AdminstratorId</td>
+                        <td>@item.CustomerId</td>
+                        <td>@item.Customer.DisplayName</td>
+                        <td>@item.Created</td>
+                        <td>@item.LatestChange</td>
+                        <td>@item.Description</td>
+                        <td>@item.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <div></div>
 </div>
+
+
+
 @code {
     private IEnumerable<CreateCaseModel> caseModel;
-    private CreateCaseModel model;
-    private int currentValue;
-    public int CurrentValue { get; set; }
+    private Request currentValue;
+
+
 
     protected override void OnInitialized()
     {
-        model = new CreateCaseModel();
+        currentValue = new Request();
     }
 
-    private async Task GetCasesOnCustomerIdAsync()
+    private async Task GetCasesOnSpecficRequestAsync()
     {
-        Console.WriteLine(CurrentValue);
-        //Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-        var url = $"https://localhost:44384/api/https://localhost:44384/getoncustomerid?id={CurrentValue}";
-        caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(url);
-        //Console.WriteLine(caseModel);
-        Console.WriteLine(url);
-    }
+        await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"");
+
+        if (currentValue.RequestFromUser == null)
+        {
+            await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"Please select a Request");
+
+        }
+
+        if (!Http.DefaultRequestHeaders.Any())
+        {
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        }
+
+        switch (currentValue.RequestFromUser)
+        {
+            case "GetOnId":
+                int result;
+                var id = int.TryParse(currentValue.ValueFromUser, out result);
+                @if (id == true)
+                {
+                    var urlid = $"https://localhost:44384/api/Cases/getoncustomerid?id={id}";
+                    caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(urlid);
+                    break;
+                }
+                else
+                {
+
+                    await jsRuntime.InvokeVoidAsync(
+                         "exampleJsFunctions.displayMessage",
+                         "Please select a id with numbers");
+
+                    break;
+                }
+
+
+
+
+                case "GetOnStatus":
+                    @if (currentValue.ValueFromUser == "Not Started" || currentValue.ValueFromUser == "Ongoing" || currentValue.ValueFromUser == "Completed")
+                    {
+                        caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getonstatus?status={currentValue.ValueFromUser}");
+                        break;
+                    }
+                    else
+                    {
+                        await jsRuntime.InvokeVoidAsync(
+                 "exampleJsFunctions.displayMessage",
+                 "Please type in one of these statuses.(Not Started, Ongoing, Completed)");
+
+                        break;
+                    }
+                    case "GetOnDate":
+                        @if (currentValue.ValueFromUser == "Oldest" || currentValue.ValueFromUser == "oldest" || currentValue.ValueFromUser == "Latest" || currentValue.ValueFromUser == "latest")
+                            {
+                                caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getondate?ordervalue={currentValue.ValueFromUser}");
+                                break;
+                            }
+                            else
+                            {
+                                await jsRuntime.InvokeVoidAsync(
+        "exampleJsFunctions.displayMessage",
+        "Please type in one of these datecommands.(Oldest/oldest, Latest/latest)");
+                                break;
+                            }
+
+                         
+
+                    default:
+                        break;
+                }
+
+                //Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+
+                //caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(url);
+                //Console.WriteLine(caseModel);
+
+            }
+
+            public class Request
+            {
+                public string RequestFromUser { get; set; }
+                public string ValueFromUser { get; set; }
+            }
 }

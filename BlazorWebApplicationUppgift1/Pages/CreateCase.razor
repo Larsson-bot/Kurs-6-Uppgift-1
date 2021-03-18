@@ -4,7 +4,7 @@
 
 <h3>Create Case</h3>
 <div class="container">
-    <h3>LoginPage</h3>
+
     <EditForm Model="caseModel"  OnValidSubmit="CreateNewCase">
         <DataAnnotationsValidator />
         <div class="row">
@@ -17,7 +17,7 @@
                 <input type="text" class="form-control" id="description" required @bind="@caseModel.Description"/>
             </div>
         </div>
-        <button type="submit" class="btn btn-secondary align-items-center">Login</button>
+        <button type="submit" class="btn btn-secondary align-items-center">Create Case</button>
         <div id="adminCreateResponse"></div>
     </EditForm>
 </div>
@@ -27,9 +27,10 @@
     private CreateCaseModel caseModel;
     private async Task CreateNewCase()
     {
-        Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-
-
+        if (!Http.DefaultRequestHeaders.Any())
+        {
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        }
         var response = await Http.PostAsJsonAsync<CreateCaseModel>("https://localhost:44384/api/Cases/create-case", caseModel);
 
 
@@ -37,8 +38,8 @@
         @if (response.StatusCode.ToString() == "404")
         {
             await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"CustomerId does not exist");
+        "exampleJsFunctions.displayMessage",
+        "CustomerId does not exist");
         }
         @if (response.IsSuccessStatusCode)
         {

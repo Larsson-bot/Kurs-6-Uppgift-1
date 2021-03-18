@@ -43,19 +43,22 @@
         </table>
     }
         @code {
-        private IEnumerable<CreateCaseModel> caseModel;
+            private IEnumerable<CreateCaseModel> caseModel;
 
-        protected override async Task OnInitializedAsync()
-        {
-            await GetCasesAsync();
-        }
+            protected override async Task OnInitializedAsync()
+            {
+                await GetCasesAsync();
+            }
 
-        private async Task GetCasesAsync()
-        {
-            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+            private async Task GetCasesAsync()
+            {
+                if (!Http.DefaultRequestHeaders.Any())
+                {
+                    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+                }
 
-            caseModel  = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Administrators/get-cases");
+                caseModel  = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
 
-        }
+            }
 
         }
