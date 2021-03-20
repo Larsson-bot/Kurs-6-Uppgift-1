@@ -1,10 +1,8 @@
 ﻿@page "/update-case"
 
-<h3>UpdateCase</h3>
+<h3>Update Cases</h3>
 
-<h1>Cases</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
 
 @if (caseModel == null)
 {
@@ -18,13 +16,14 @@ else
 
 <table class="table">
     <tr>
-        <th>Id</th>
+        <th>CaseId</th>
         <th>Customer</th>
         <th>AdminId</th>
         <th>Description</th>
         <th>Created</th>
         <th>Last Changed</th>
         <th>Status</th>
+        <th>Edit</th>
     </tr>
     @foreach (var item in caseModel)
     {
@@ -33,22 +32,22 @@ else
         {
             <tr>
                 <td>
-                    <input type="text" class="form-control" disabled="disabled"  value="@item.Id" />
+                    @item.Id 
                 </td>
                 <td>
-                    <input type="text" class="form-control" value="@item.Customer.DisplayName" disabled="disabled" />
+                    @item.Customer.DisplayName
                 </td>
                 <td>
-                    <input type="text" class="form-control" disabled="disabled" value="@item.AdminstratorId" />
+                   @item.AdminstratorId
                 </td>
                 <td>
-                    <input type="text" class="form-control" value="@item.Description" disabled="disabled"/>
+                 @item.Description
                 </td>
                 <td>
-                    <input type="text" class="form-control" value="@item.Created" disabled="disabled"/>
+                   @item.Created
                 </td>
                 <td>
-                    <input type="text" class="form-control" value="@item.LatestChange" disabled="disabled"/>
+                   @item.LatestChange
                 </td>
                 <td>
                     <select @bind="item.Status" required>
@@ -57,12 +56,12 @@ else
                         <option value="Completed">Completed</option>
                     </select>
                 </td>
-                <td>
-                    <button type="button" class="btn btn-link" @onclick="() => EnableEditing(false, item)">
-                        <i class="fas fa-window-close" />
+                <td  >
+                    <button type="button" class="btn btn-link" style="text-decoration: none" @onclick="() => EnableEditing(false, item)">
+                        <i class="fas fa-window-close text-decoration-none" />
                     </button>
-                    <button type="button" class="btn btn-link" @onclick="() => UpdateInstance(item)">
-                        <i class="fas fa-check-square" />
+                    <button type="button" class="btn btn-link text-decoration-none" @onclick="() => UpdateInstance(item)">
+                        <i class="fas fa-check-square " />
                     </button>
                 </td>
             </tr>
@@ -80,7 +79,8 @@ else
     <td>@item.LatestChange</td>
     <td>@item.Status</td>
     <td>
-        <button type="button" class="btn btn-link" @onclick="() => EnableEditing(true, item)">
+
+        <button type="button" class="btn btn-link" style="text-decoration: none" @onclick="() => EnableEditing(true, item)">
             <i class="fas fa-pen" />
         </button>
     </td>
@@ -100,10 +100,10 @@ else
 
     private async Task GetCasesAsync()
     {
-        if (!Http.DefaultRequestHeaders.Any())
-        {
-            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-        }
+        //if (!Http.DefaultRequestHeaders.Any())
+        //{
+        //    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        //}
 
         caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
 

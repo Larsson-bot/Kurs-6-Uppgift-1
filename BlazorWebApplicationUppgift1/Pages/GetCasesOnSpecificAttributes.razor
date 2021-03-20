@@ -1,33 +1,136 @@
 ﻿@page "/specfic-case"
 
 <h3>GetCasesOnSpecificAttributes</h3>
+@*<div class="container">
+        <EditForm Model="currentValue" OnSubmit="GetCasesOnSpecficRequestAsync">
+            <div class="row">
+                <div class="form-group col-6">
+                    <input type="text" class="form-check" placeholder="Specific Value" @bind="currentValue.ValueFromUser" required />
+                </div>
+                <div class="form-group col-6">
+                    <select @bind="currentValue.RequestFromUser" required class="form-control">
+                        <option>--Select Request--</option>
+                        <option value="GetOnId">GetOnId</option>
+                        <option value="GetOnStatus">GetOnStatus</option>
+                        <option value="GetOnDate">GetOnDate</option>
+                    </select>
+                    <div id="adminCreateResponse"></div>
+                </div>
+                <button>Request Data From Api</button>
+            </div>
+
+        </EditForm>
+
+        @if (caseModel == null)
+        {
+            <div>No cases has been found.</div>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>AdminId</th>
+                        <th>CustomerId</th>
+                        <th>Customer</th>
+                        <th>Created</th>
+                        <th>Last Changed</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in caseModel)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.AdminstratorId</td>
+                            <td>@item.CustomerId</td>
+                            <td>@item.Customer.DisplayName</td>
+                            <td>@item.Created</td>
+                            <td>@item.LatestChange</td>
+                            <td>@item.Description</td>
+                            <td>@item.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <div></div>
+    </div>*@
+
+
 <div class="container">
     <EditForm Model="currentValue" OnSubmit="GetCasesOnSpecficRequestAsync">
-        <div class="form-group">
-            <input type="text" class="form-check" placeholder="Specific Value" @bind="currentValue.ValueFromUser" required />
+        <div class="row">
+            @*<div class="form-group col-6">
+                    <input type="text" class="form-control" placeholder="Specific Value" @bind="currentValue.ValueFromUser" required />
+                </div>*@
+            <div class="form-group col-6">
+                <select @bind="currentValue.RequestFromUser" required class="form-control">
+                    <option>--Select Request--</option>
+                    <option value="GetOnId">GetOnId</option>
+                    <option value="GetOnStatus">GetOnStatus</option>
+                    <option value="GetOnDate">GetOnDate</option>
+                </select>
+                <div id="adminCreateResponse"></div>
+            </div>
+            @if (currentValue.RequestFromUser == "GetOnId")
+            {
+                <div class="form-group col-6">
+                    <select @bind="currentValue.ValueFromUser" required class="form-control">
+                        <option>--Select Customer--</option>
+                        @if (customers != null)
+                        {
+                            foreach (var customer in customers)
+                            {
+                                <option value="@customer.Id">@customer.DisplayName</option>
+                            }
+
+                        }
+                    </select>
+
+                </div>
+            }
+            @if (currentValue.RequestFromUser == "GetOnStatus")
+            {
+                <div class="form-group col-6">
+                    <select @bind="currentValue.ValueFromUser" required class="form-control">
+                        <option>--Select Status--</option>
+                        <option value="Not Started">Not Started</option>
+                        <option value="Ongoing">Ongoing</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+
+                </div>
+            }
+            @if (currentValue.RequestFromUser == "GetOnDate")
+            {
+                <div class="form-group col-6">
+                    <select @bind="currentValue.ValueFromUser" required class="form-control">
+                        <option>--Select SortingMethod--</option>
+                        <option value="Latest">Latest</option>
+                        <option value="Oldest">Oldest</option>
+                    </select>
+
+                </div>
+            }
+            <button type="submit">Request Data From Api</button>
         </div>
-        <div class="form-group">
-            <select @bind="currentValue.RequestFromUser" required>
-                <option>--Select Request--</option>
-                <option value="GetOnId">GetOnId</option>
-                <option value="GetOnStatus">GetOnStatus</option>
-                <option value="GetOnDate">GetOnDate</option>
-            </select>
-            <div id="adminCreateResponse"></div>
-        </div>
-        <button>Request Data From Api</button>
+
     </EditForm>
 
     @if (caseModel == null)
     {
-        <div>No cases has been found.</div>
+
     }
     else
     {
         <table class="table">
             <thead>
                 <tr>
-                    <th>Id</th>
+                    <th>CaseId</th>
                     <th>AdminId</th>
                     <th>CustomerId</th>
                     <th>Customer</th>
@@ -54,20 +157,20 @@
             </tbody>
         </table>
     }
-    <div></div>
 </div>
-
 
 
 @code {
     private IEnumerable<CreateCaseModel> caseModel;
     private Request currentValue;
+    private IEnumerable<CustomerModel> customers;
 
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         currentValue = new Request();
+        customers = await Http.GetFromJsonAsync<IEnumerable<CustomerModel>>("https://localhost:44384/api/Customers");
     }
 
     private async Task GetCasesOnSpecficRequestAsync()
@@ -76,18 +179,9 @@
 "exampleJsFunctions.displayMessage",
 "");
 
-        if (currentValue.RequestFromUser == null)
-        {
-            await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"Please select a Request");
 
-        }
 
-        if (!Http.DefaultRequestHeaders.Any())
-        {
-            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-        }
+  
 
         switch (currentValue.RequestFromUser)
         {
@@ -96,8 +190,10 @@
                 var id = int.TryParse(currentValue.ValueFromUser, out result);
                 @if (id == true)
                 {
-                    var urlid = $"https://localhost:44384/api/Cases/getoncustomerid?id={id}";
+
+                    var urlid = $"https://localhost:44384/api/Cases/getoncustomerid?id={currentValue.ValueFromUser}";
                     caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(urlid);
+                 
                     break;
                 }
                 else
@@ -129,34 +225,37 @@
                     }
                     case "GetOnDate":
                         @if (currentValue.ValueFromUser == "Oldest" || currentValue.ValueFromUser == "oldest" || currentValue.ValueFromUser == "Latest" || currentValue.ValueFromUser == "latest")
-                            {
-                                caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getondate?ordervalue={currentValue.ValueFromUser}");
-                                break;
-                            }
-                            else
+                        {
+                            caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getondate?ordervalue={currentValue.ValueFromUser}");
+                            break;
+                        }
+                        else
+                        {
+                            await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"Please type in one of these datecommands.(Oldest/oldest, Latest/latest)");
+                            break;
+                        }
+
+
+
+                        default:
                             {
                                 await jsRuntime.InvokeVoidAsync(
-        "exampleJsFunctions.displayMessage",
-        "Please type in one of these datecommands.(Oldest/oldest, Latest/latest)");
+"exampleJsFunctions.displayMessage",
+"Please select a Request");
                                 break;
                             }
 
-                         
+                    }
 
-                    default:
-                        break;
+
+
                 }
 
-                //Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-
-                //caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(url);
-                //Console.WriteLine(caseModel);
-
-            }
-
-            public class Request
-            {
-                public string RequestFromUser { get; set; }
-                public string ValueFromUser { get; set; }
-            }
+                public class Request
+                {
+                    public string RequestFromUser { get; set; }
+                    public string ValueFromUser { get; set; }
+                }
 }

@@ -1,40 +1,124 @@
 ﻿@page "/create-customer"
 
-<h1>Create Customer</h1>
+<div class="container mt-5">
+    <div class="d-flex justify-content-start ms-4">
+        <h3>Create Customer</h3>
+    </div>
+    <div class="customer-grid p-5">
+        <div class="col-8">
+            <EditForm Model="customer" OnValidSubmit="CreateNewCustomer">
+                <DataAnnotationsValidator />
+                <div class="form-floating row mb-3">
+                    <input type="text" class="form-control" id="floatingFname" required @bind="customer.FirstName" @ref="myref" placeholder="name@example.com" />
+                    <label for="floatingFname">FirstName</label>
+                </div>
+                <div class="form-floating row mb-3">
+                    <input type="text" class="form-control" id="floatingLname" required @bind="customer.LastName" placeholder="name@example.com" />
+                    <label for="floatingLname">LastName</label>
+                </div>
+                <div class="form-floating row mb-3">
+                    <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com">
+                    <label for="floatingEmail">Email address</label>
+                </div>
+                <div class="row">
+                    <button type="submit" class="btn btn-secondary align-items-center">Create Customer</button>
+                </div>
+                <div id="adminCreateResponse"></div>
+            </EditForm>
+        </div>
+    
 
-<EditForm Model="customer" OnValidSubmit="CreateNewCustomer">
-    <DataAnnotationsValidator />
-    <div class="form-group col-10">
-        <input type="text" class="form-check" placeholder="FirstName" @bind="customer.FirstName" required />
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Namn</th>
+                    <th scope="col">Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (customers != null)
+                {
+                    @foreach (var customer in customers)
+                    {
+                        <tr>
+                            <td>@customer.Id</td>
+                            <td>@customer.DisplayName</td>
+                            <td>@customer.Email</td>
+                        </tr>
+                    }
+                }
+
+
+            </tbody>
+        </table>
     </div>
-    <div class="form-group">
-        <input type="text" class="form-check" placeholder="LastName" required @bind="customer.LastName" />
-    </div>
-    <div class="form-group">
-        <input type="email" class="form-check" placeholder="Email" required @bind="customer.Email" />
-    </div>
-    <button type="submit" class="btn btn-secondary align-items-center">Login</button>
-    <div id="adminCreateResponse"></div>
-</EditForm>
+</div>
+
+@*<h1>Create Customer</h1>
+<div class="container">
+    <EditForm Model="customer" OnValidSubmit="CreateNewCustomer">
+        <DataAnnotationsValidator />
+        <div class="row g-4">
+            <div class="form-group col-6">
+                <input type="text" class="form-check" placeholder="FirstName" @bind="customer.FirstName" required />
+            </div>
+            <div class="form-group col-6">
+                <input type="text" class="form-check" placeholder="LastName" required @bind="customer.LastName" />
+            </div>
+            <div class="form-group col-12">
+                <input type="email" class="form-check" placeholder="Email" required @bind="customer.Email" />
+            </div>
+            <button type="submit" class="btn btn-secondary align-items-center">Login</button>
+            <div id="adminCreateResponse"></div>
+        </div>
+    </EditForm>
+</div>*@
 @code {
     private CustomerModel customer;
-
+    private IEnumerable<CustomerModel> customers;
+    private ElementReference myref;
     private async Task CreateNewCustomer()
     {
         if (!Http.DefaultRequestHeaders.Any())
         {
             Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
         }
-        var response = Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Administrators/create-customer", customer);
+        var response = await Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Administrators/create-customer", customer);
         customer = new CustomerModel();
+        await GetCustomers();
         await jsRuntime.InvokeVoidAsync(
 "exampleJsFunctions.displayMessage",
 "Customer has been created");
+        await Task.Delay(2000);
+        await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"");
     }
 
-    protected override void OnInitialized()
+    private async Task GetCustomers()
     {
-        customer = new CustomerModel();
+        customers = await Http.GetFromJsonAsync<IEnumerable<CustomerModel>>("https://localhost:44384/api/Customers");
+    }
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Http.DefaultRequestHeaders.Any())
+        {
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+        }
+
+        customer = new CustomerModel();
+        await GetCustomers();
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await myref.FocusAsync();
+        }
     }
 }

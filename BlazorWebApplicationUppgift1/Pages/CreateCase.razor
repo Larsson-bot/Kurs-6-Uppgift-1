@@ -5,66 +5,91 @@
 <h3>Create Case</h3>
 <div class="container">
 
-    <EditForm Model="caseModel"  OnValidSubmit="CreateNewCase">
+    <EditForm Model="caseModel" OnValidSubmit="CreateNewCase">
         <DataAnnotationsValidator />
         <div class="row">
-            <div class="form-group  col-6">
-                <label for="customerid">CustomerId</label>
-                <input type="text" class="form-control" id="customerId" @bind="@caseModel.CustomerId" required />
+
+            <div class="form-group col-6 ">
+                <label for="description">Customer</label><br>
+                <select class="selectblock form-control" @bind="caseModel.CustomerId" required @ref="myref">
+                    <option>---Select a Customer---</option>
+                    @if (customers != null)
+                    {
+                        @foreach (var customer in customers)
+                        {
+                            <option value="@customer.Id">@customer.DisplayName</option>
+                        }
+                    }
+                </select>
             </div>
             <div class="form-group  col-6">
                 <label for="description">Description</label>
-                <input type="text" class="form-control" id="description" required @bind="@caseModel.Description"/>
+                <input type="text" class="form-control" id="description" required @bind="@caseModel.Description" />
             </div>
         </div>
-        <button type="submit" class="btn btn-secondary align-items-center">Create Case</button>
+        <button type="submit" class="btn btn-secondary align-items-center mt-4">Create Case</button>
         <div id="adminCreateResponse"></div>
     </EditForm>
 </div>
 
 
+
 @code {
     private CreateCaseModel caseModel;
+    private IEnumerable<CustomerModel> customers;
+    private ElementReference myref;
     private async Task CreateNewCase()
     {
         if (!Http.DefaultRequestHeaders.Any())
         {
             Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
         }
-        var response = await Http.PostAsJsonAsync<CreateCaseModel>("https://localhost:44384/api/Cases/create-case", caseModel);
-
-
-
-        @if (response.StatusCode.ToString() == "404")
+        @if (caseModel.CustomerId != 0)
         {
-            await jsRuntime.InvokeVoidAsync(
-        "exampleJsFunctions.displayMessage",
-        "CustomerId does not exist");
-        }
-        @if (response.IsSuccessStatusCode)
-        {
+            var response = await Http.PostAsJsonAsync<CreateCaseModel>("https://localhost:44384/api/Cases/create-case", caseModel);
 
-            await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"Case has been created");
 
-            await Task.Delay(10000);
-            caseModel = new CreateCaseModel();
+
+            @if (response.StatusCode.ToString() == "404")
+            {
+                await jsRuntime.InvokeVoidAsync(
+            "exampleJsFunctions.displayMessage",
+            "CustomerId does not exist");
+            }
+            @if (response.IsSuccessStatusCode)
+            {
+
+                await jsRuntime.InvokeVoidAsync(
+    "exampleJsFunctions.displayMessage",
+    "Case has been created");
+
+                await Task.Delay(10000);
+                caseModel = new CreateCaseModel();
+            }
+
+
+
         }
 
         else
         {
             await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"Bad request");
-        }
+                 "exampleJsFunctions.displayMessage",
+                 "Please Choose A Customer");
+            await myref.FocusAsync();
 
         }
 
-        protected override void OnInitialized()
-        {
-            caseModel = new CreateCaseModel();
-        }
+    }
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        caseModel = new CreateCaseModel();
+        customers = await Http.GetFromJsonAsync<IEnumerable<CustomerModel>>("https://localhost:44384/api/Customers");
+    }
 
 
 }

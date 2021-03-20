@@ -1,50 +1,59 @@
-﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
-
-html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+﻿.navbar {
+    background-color: #34568b;
+    /* background-color: #8693e9; */
+    /* background-color: rgba(40, 226, 96, 0.644); */
+    font-weight: 600;
+    font-size: 18px;
+    color:white;
 }
 
-a, .btn-link {
-    color: #0366d6;
+.navbar-brand {
+    color: white !important;
+    font-size:24px;
 }
 
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+
+
+tbody, td, tfoot, th, thead, tr {
+    border-width: 2px;
 }
 
-.content {
-    padding-top: 1.1rem;
+
+.nav-link {
+    color: white !important;
 }
 
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+.table > :not(:last-child) > :last-child > * {
+    border-bottom: none !important;
+    border-bottom-color: none !important;
 }
 
-.invalid {
-    outline: 1px solid red;
+/*html body {
+       background-color: rgba(42, 10, 71, 0.644); 
+}
+*/
+
+html body {
+    background-color: rgba(155, 145, 204, 0.644);
 }
 
-.validation-message {
-    color: red;
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px rgba(66, 68, 211, 0.507);
+    border-radius: 1px;
+}
+.customer-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr;
 }
 
-#blazor-error-ui {
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
+.selectblock {
+    padding: 6px 6px;
+    border-radius: 5px;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
+table tr {
+    background-color: rgba(249, 249, 250, 0.753);
+}
+  
+

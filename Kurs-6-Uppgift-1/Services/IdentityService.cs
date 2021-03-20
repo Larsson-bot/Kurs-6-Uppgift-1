@@ -83,6 +83,14 @@ namespace Kurs_6_Uppgift_1.Services
                 
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
+                if(user == null)
+                {
+                    return new SignInResponseModel
+                    {
+                        Succeeded = false
+                    };
+                }
+
                 
                 var token = _context.Tokens.FirstOrDefault(t => t.UserId == user.Id);
                 if (token != null)
@@ -98,20 +106,34 @@ namespace Kurs_6_Uppgift_1.Services
                 
                 if(token != null)
                 {
+                    try
+                    {
+                        if (user.ValidatePasswordHash(password))
+                        {
+                            return new SignInResponseModel
+                            {
+                                Succeeded = true,
+                                Result = new SignInResult
+                                {
+                                    Id = user.Id,
+                                    Email = user.Email,
+                                    AccessToken = token.AccessToken,
+                                    ExpireDate = token.ExpireDate
+                                }
+                            };
+                        }
+                    }
+                    catch
+                    {
+
+                    }
                     return new SignInResponseModel
                     {
-                        Succeeded = true,
-                        Result = new SignInResult
-                        {
-                            Id = user.Id,
-                            Email = user.Email,
-                            AccessToken = token.AccessToken,
-                            ExpireDate = token.ExpireDate
-                        }
+                        Succeeded = false
                     };
                 }
-
-                if(user != null)
+            
+                if (user != null)
                 {
                     try
                     {

@@ -1,0 +1,170 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject HttpClient Http
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-edit me-1 fa-2x"></i>
+            <a class="navbar-brand me-4" href="#">CaseHandlerApplication</a>
+        </div>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+                @if (!AdminView)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="create-admin">Create Admin</a>
+                    </li>
+                }
+                @if (!ShowLink)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="check">Create Customer</a>
+                    </li>
+                }
+
+
+                @if (CaseView)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="create-case">Create Case</a>
+                    </li>
+                }
+                @if (CaseViewAll)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Case Function Menu
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <li><a class="dropdown-item" href="get-cases">Get Cases</a></li>
+                            <li><a class="dropdown-item" href="specfic-case">Get Specfic Cases</a></li>
+                            <li><a class="dropdown-item" href="update-case">Update Cases</a></li>
+                        </ul>
+                    </li>
+                }
+
+            </ul>
+            @if (ShowLink)
+            {
+                <span class="navbar-text">
+                    <a class="nav-link" href="login">Sign in</a>
+                </span>
+            }
+            @if (AdminView)
+            {
+
+                <div>Welcome @admin.FirstName!</div>
+
+
+                <span class="navbar-text">
+                    <a class="nav-link" href="logout">Sign out</a>
+                </span>
+
+
+            }
+
+        </div>
+    </div>
+</nav>
+
+@code {
+
+    private IEnumerable<CustomerModel> customers;
+    private CreateAdminModel admin;
+    private CreateAdminModel existadmin;
+    private IEnumerable<CreateCaseModel> cases;
+
+
+
+    public bool ShowLink { get; set; } = true;
+
+    public bool AdminView { get; set; } = false;
+
+
+    public bool CaseView { get; set; } = false;
+
+    public bool CaseViewAll { get; set; } = false;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await TokenExistAsync();
+
+    }
+
+    private async Task TokenExistAsync()
+    {
+
+        var token = await sessionStorage.GetItemAsync<string>("AccessToken");
+        @if (token != null)
+        {
+
+            ShowLink = false;
+            AdminView = true;
+            await GetAdmin();
+            await CheckIfCustomersExist();
+        }
+
+    }
+
+
+
+    private async Task GetAdmin()
+    {
+
+
+        @if (!Http.DefaultRequestHeaders.Any())
+        {
+
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+
+        }
+
+        admin = await Http.GetFromJsonAsync<CreateAdminModel>("https://localhost:44384/api/Administrators/GetAdminInfo");
+    }
+
+
+
+
+    private async Task CheckIfCustomersExist()
+    {
+
+        @if (!Http.DefaultRequestHeaders.Any())
+        {
+
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+
+        }
+
+        customers = await Http.GetFromJsonAsync<IEnumerable<CustomerModel>>("https://localhost:44384/api/Customers");
+        @if (customers != null)
+        {
+            CaseView = true;
+            await CheckIfCasesExist();
+        }
+    }
+
+    private async Task CheckIfCasesExist()
+    {
+
+        @if (!Http.DefaultRequestHeaders.Any())
+        {
+
+            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
+
+        }
+
+        cases = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
+        @if (cases != null)
+        {
+            CaseViewAll = true;
+        }
+    }
+
+}

@@ -1,33 +1,29 @@
 ﻿@page "/get-cases"
 
 
-    <h1>Cases</h1>
-
-    <p>This component demonstrates fetching data from the server.</p>
-
-
-    @if (caseModel == null)
-    {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>AdminId</th>
-                    <th>CustomerId</th>
-                    <th>Customer</th>
-                    <th>Created</th>
-                    <th>Last Changed</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in caseModel)
-                {
+<h1>Cases</h1>
+@if (caseModel == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>CaseId</th>
+                <th>AdminId</th>
+                <th>CustomerId</th>
+                <th>Customer</th>
+                <th>Created</th>
+                <th>Last Changed</th>
+                <th>Description</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in caseModel)
+            {
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.AdminstratorId</td>
@@ -38,27 +34,21 @@
                     <td>@item.Description</td>
                     <td>@item.Status</td>
                 </tr>
-                }
-            </tbody>
-        </table>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    private IEnumerable<CreateCaseModel> caseModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCasesAsync();
     }
-        @code {
-            private IEnumerable<CreateCaseModel> caseModel;
 
-            protected override async Task OnInitializedAsync()
-            {
-                await GetCasesAsync();
-            }
+    private async Task GetCasesAsync()
+    {
+       caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
+    }
 
-            private async Task GetCasesAsync()
-            {
-                if (!Http.DefaultRequestHeaders.Any())
-                {
-                    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-                }
-
-                caseModel  = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
-
-            }
-
-        }
+}

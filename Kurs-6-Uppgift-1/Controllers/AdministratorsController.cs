@@ -66,13 +66,13 @@ namespace Kurs_6_Uppgift_1.Controllers
         }
 
         [HttpGet("GetAdminInfo")]
-        public async Task<IActionResult> GetAdminAsync(int id)
+        public async Task<IActionResult> GetAdminAsync()
         {
             var admin = await _context.Users.FirstOrDefaultAsync();
             if (admin != null)
                 return new OkObjectResult(admin);
 
-            return new BadRequestObjectResult("Invalid Email or Password");
+            return new BadRequestObjectResult("Admin does not exist!");
         }
 
 
