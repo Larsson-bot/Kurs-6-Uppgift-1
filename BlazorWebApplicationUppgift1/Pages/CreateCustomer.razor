@@ -17,7 +17,7 @@
                     <label for="floatingLname">LastName</label>
                 </div>
                 <div class="form-floating row mb-3">
-                    <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required @bind="customer.Email" >
+                    <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required @bind="customer.Email">
                     <label for="floatingEmail">Email address</label>
                 </div>
                 <div class="row">
@@ -26,8 +26,6 @@
                 <div id="adminCreateResponse"></div>
             </EditForm>
         </div>
-    
-
         <table class="table">
             <thead>
                 <tr>
@@ -54,26 +52,6 @@
         </table>
     </div>
 </div>
-
-@*<h1>Create Customer</h1>
-<div class="container">
-    <EditForm Model="customer" OnValidSubmit="CreateNewCustomer">
-        <DataAnnotationsValidator />
-        <div class="row g-4">
-            <div class="form-group col-6">
-                <input type="text" class="form-check" placeholder="FirstName" @bind="customer.FirstName" required />
-            </div>
-            <div class="form-group col-6">
-                <input type="text" class="form-check" placeholder="LastName" required @bind="customer.LastName" />
-            </div>
-            <div class="form-group col-12">
-                <input type="email" class="form-check" placeholder="Email" required @bind="customer.Email" />
-            </div>
-            <button type="submit" class="btn btn-secondary align-items-center">Login</button>
-            <div id="adminCreateResponse"></div>
-        </div>
-    </EditForm>
-</div>*@
 @code {
     private CustomerModel customer;
     private IEnumerable<CustomerModel> customers;
@@ -86,31 +64,35 @@
 "exampleJsFunctions.displayMessage",
 "");
 
-        var response = await Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Administrators/create-customer", customer);
+        var response = await Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Customers", customer);
 
 
 
         @if (response.IsSuccessStatusCode)
         {
-            customer = new CustomerModel();
             await GetCustomers();
-            await jsRuntime.InvokeVoidAsync(
+            @if (customers.Count() == 1)
+            {
+                NavManager.NavigateTo("create-customer", true);
+            }
+            else
+            {
+                customer = new CustomerModel();
+                await jsRuntime.InvokeVoidAsync(
     "exampleJsFunctions.displayMessage",
     "Customer has been created");
-            await Task.Delay(2000);
-            await jsRuntime.InvokeVoidAsync(
-    "exampleJsFunctions.displayMessage",
-    "");
+                await Task.Delay(2000);
+                await jsRuntime.InvokeVoidAsync(
+                    "exampleJsFunctions.displayMessage",
+                 "");
+            }
         }
-
         else
         {
             await jsRuntime.InvokeVoidAsync(
 "exampleJsFunctions.displayMessage",
 "Email already exists in database! Please choose another.");
         }
-
-       
     }
 
     private async Task GetCustomers()

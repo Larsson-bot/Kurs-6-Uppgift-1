@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Kurs_6_Uppgift_1.Data;
+using Kurs_6_Uppgift_1.Services;
 
 namespace Kurs_6_Uppgift_1.Controllers
 {
@@ -14,94 +15,38 @@ namespace Kurs_6_Uppgift_1.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly SqlDbContext _context;
+        private readonly IIdentityService _identityService;
 
-        public CustomersController(SqlDbContext context)
+        public CustomersController(SqlDbContext context, IIdentityService identityService)
         {
             _context = context;
+            _identityService = identityService;
         }
 
-        // GET: api/Customers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
             return await _context.Customers.ToListAsync();
         }
 
-        // GET: api/Customers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        [HttpGet("customer/{id}")]
+        public async Task<IActionResult> GetSpecificCustomer(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
-
-            if (customer == null)
+            if (_context.Customers.Count() < id)
             {
-                return NotFound();
+                return new BadRequestObjectResult("Customer does not exist");
             }
-
-            return customer;
+            else
+                return new OkObjectResult(await _identityService.GetSpecificCustomer(id));
         }
 
-        // PUT: api/Customers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCustomer(int id, Customer customer)
-        {
-            if (id != customer.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(customer).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CustomerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Customers
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
+        public async Task<IActionResult> CreateCustomer([FromBody] Customer model)
         {
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            if (await _identityService.CreateCustomerAsync(model))
+                return new OkObjectResult("Customer has been created");
 
-            return CreatedAtAction("GetCustomer", new { id = customer.Id }, customer);
-        }
-
-        // DELETE: api/Customers/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCustomer(int id)
-        {
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
-
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool CustomerExists(int id)
-        {
-            return _context.Customers.Any(e => e.Id == id);
+            return new BadRequestObjectResult("Email already exists!");
         }
     }
 }

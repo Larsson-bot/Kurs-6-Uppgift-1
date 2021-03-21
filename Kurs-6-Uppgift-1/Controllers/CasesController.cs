@@ -25,15 +25,12 @@ namespace Kurs_6_Uppgift_1.Controllers
             _context = context;
         }
 
-        // GET: api/Cases
         [HttpGet]
         public async Task<IActionResult> GetCases()
         {
-
             return new OkObjectResult(await _identityService.GetCases());
         }
 
-        // GET: api/Cases/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Case>> GetCase(int id)
         {
@@ -43,37 +40,16 @@ namespace Kurs_6_Uppgift_1.Controllers
             {
                 return NotFound();
             }
-
             return @case;
         }
 
-        // PUT: api/Cases/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCase(int id, Case updatedCase)
         {
             updatedCase.Id = id;
-            if (id != updatedCase.Id)
-            {
-                return BadRequest();
-            }
-
-
-
             var date = DateTime.Now;
             updatedCase.LatestChange = DateTime.Now;
-            
-            //foreach (var errand in issue)
-            //{
-            //    updatedCase.AdminstratorId = errand.AdminstratorId;
-            //    updatedCase.Created = errand.Created;
-            //    updatedCase.CustomerId = errand.CustomerId;
-            //    updatedCase.LatestChange = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second);
-            //    updatedCase.Description = errand.Description;
-            //}
-
             _context.Entry(updatedCase).State = EntityState.Modified;
-
             try
             {
                 await _context.SaveChangesAsync();
@@ -96,21 +72,21 @@ namespace Kurs_6_Uppgift_1.Controllers
         [HttpPost("create-case")]
         public async Task<IActionResult> CreateCase([FromBody] Case model)
         {
-            if (_context.Customers.Count() < model.CustomerId)
+            var customer = _context.Customers.FirstOrDefault(x => x.Id == model.CustomerId);
+            if (customer != null)
             {
-                return new NotFoundObjectResult("Customer was not found.");
+                if (await _identityService.CreateCaseAsync(model))
+                    return new OkResult();
+
+                return new BadRequestResult();
             }
-
-            if (await _identityService.CreateCaseAsync(model))
-                return new OkResult();
-
-            return new BadRequestResult();
+            return new NotFoundObjectResult("Customer was not found.");
+           
         }
 
         [HttpGet("getonstatus")]
         public async Task<IActionResult> GetOnStatus(string status)
         {
-            //var list = await _identityService.GetNewStatusCases(status);
             var list = await _context.Cases.Where(x => x.Status == status).ToListAsync();
             if (list.Count() != 0)
             {
@@ -123,7 +99,7 @@ namespace Kurs_6_Uppgift_1.Controllers
                 }
                 return new OkObjectResult(list);
             }
-            return new BadRequestObjectResult("No Cases found.");
+            return new OkObjectResult(list);
         }
 
         [HttpGet("getoncustomerid")]
@@ -147,38 +123,26 @@ namespace Kurs_6_Uppgift_1.Controllers
         [HttpGet("getondate")]
         public async Task<IActionResult> GetCasesOnSortedDate(string ordervalue)
         {
-
             var list =  await _context.Cases.ToListAsync();
-
-           
-           
-            if (list.Count() != 0)
+            foreach (var @case in list)
             {
-
-                foreach (var @case in list)
-                {
-                    var customer = _context.Customers.AsNoTracking().FirstOrDefault(c => c.Id == @case.CustomerId);
-
-                    @case.Customer = customer;
-                }
-
-                if (ordervalue.ToLower() == "latest")
-                {
-                    var anotherlist =  list.OrderByDescending(c => c.Created);
-                    return new OkObjectResult(anotherlist);
-                }
-
-                if (ordervalue.ToLower() == "oldest")
-                {
-                    var anotherlist= list.OrderBy(s => s.Created);
-                    return new OkObjectResult(anotherlist);
-                }
-                return new OkObjectResult(list);
+                var customer = _context.Customers.AsNoTracking().FirstOrDefault(c => c.Id == @case.CustomerId);
+                @case.Customer = customer;
             }
-            return new BadRequestObjectResult("No Cases found.");
+
+            if (ordervalue.ToLower() == "latest")
+            {
+                var anotherlist =  list.OrderByDescending(c => c.Created);
+                return new OkObjectResult(anotherlist);
+            }
+
+            if (ordervalue.ToLower() == "oldest")
+            {
+                var anotherlist= list.OrderBy(s => s.Created);
+                return new OkObjectResult(anotherlist);
+            }
+            return new OkObjectResult(list); 
         }
-
-
 
         private bool CaseExists(int id)
         {

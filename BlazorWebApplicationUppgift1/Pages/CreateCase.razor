@@ -3,7 +3,6 @@
 
 <div class="container mt-5">
     <h1 class="createheadline">Create Case</h1>
-
     <EditForm Model="caseModel" OnValidSubmit="CreateNewCase">
         <DataAnnotationsValidator />
         <div class="row">
@@ -21,11 +20,13 @@
                 </select>
             </div>
             <div class="form-group  col-6">
-                <label for="description">Description</label>
+                <label for="description" class="text-label">Description</label>
                 <input type="text" class="form-control" id="description" required @bind="@caseModel.Description" />
             </div>
         </div>
-        <button type="submit" class="btn btn-secondary align-items-center mt-4">Create Case</button>
+            <div>
+                <button type="submit" class="btn btn-secondary mt-4 create-button">Create Case</button>
+            </div>
         <div id="adminCreateResponse"></div>
     </EditForm>
 </div>
@@ -35,19 +36,13 @@
 @code {
     private CreateCaseModel caseModel;
     private IEnumerable<CustomerModel> customers;
+    private IEnumerable<CreateCaseModel> cases;
     private ElementReference myref;
     private async Task CreateNewCase()
-    {
-        if (!Http.DefaultRequestHeaders.Any())
-        {
-            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-        }
+    {   
         @if (caseModel.CustomerId != 0)
         {
             var response = await Http.PostAsJsonAsync<CreateCaseModel>("https://localhost:44384/api/Cases/create-case", caseModel);
-
-
-
             @if (response.StatusCode.ToString() == "404")
             {
                 await jsRuntime.InvokeVoidAsync(
@@ -56,17 +51,22 @@
             }
             @if (response.IsSuccessStatusCode)
             {
-
+                cases = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
                 await jsRuntime.InvokeVoidAsync(
     "exampleJsFunctions.displayMessage",
     "Case has been created");
-
-                await Task.Delay(10000);
-                caseModel = new CreateCaseModel();
+               
+                @if(cases.Count() == 1)
+                {
+                    await Task.Delay(2000);
+                    NavManager.NavigateTo("create-case", true);
+                }
+                else
+                {
+                    await Task.Delay(5000);
+                    caseModel = new CreateCaseModel();
+                }
             }
-
-
-
         }
 
         else
@@ -75,14 +75,8 @@
                  "exampleJsFunctions.displayMessage",
                  "Please Choose A Customer");
             await myref.FocusAsync();
-
         }
-
     }
-
-
-
-
     protected override async Task OnInitializedAsync()
     {
         caseModel = new CreateCaseModel();

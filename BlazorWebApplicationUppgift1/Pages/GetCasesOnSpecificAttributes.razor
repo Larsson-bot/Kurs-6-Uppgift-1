@@ -1,125 +1,64 @@
 ﻿@page "/specfic-case"
-
-<h1 class="createheadline">Get Cases On Specific Attributes</h1>
-@*<div class="container">
+<div class="container">
+    <h1 class="specficheader mb-4">Get Cases On Specific Attributes</h1>
+    <div class="container">
         <EditForm Model="currentValue" OnSubmit="GetCasesOnSpecficRequestAsync">
             <div class="row">
                 <div class="form-group col-6">
-                    <input type="text" class="form-check" placeholder="Specific Value" @bind="currentValue.ValueFromUser" required />
-                </div>
-                <div class="form-group col-6">
                     <select @bind="currentValue.RequestFromUser" required class="form-control">
                         <option>--Select Request--</option>
-                        <option value="GetOnId">GetOnId</option>
+                        <option value="GetOnCustomer">GetOnCustomer</option>
                         <option value="GetOnStatus">GetOnStatus</option>
                         <option value="GetOnDate">GetOnDate</option>
                     </select>
-                    <div id="adminCreateResponse"></div>
                 </div>
-                <button>Request Data From Api</button>
-            </div>
-
-        </EditForm>
-
-        @if (caseModel == null)
-        {
-            <div>No cases has been found.</div>
-        }
-        else
-        {
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>AdminId</th>
-                        <th>CustomerId</th>
-                        <th>Customer</th>
-                        <th>Created</th>
-                        <th>Last Changed</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in caseModel)
-                    {
-                        <tr>
-                            <td>@item.Id</td>
-                            <td>@item.AdminstratorId</td>
-                            <td>@item.CustomerId</td>
-                            <td>@item.Customer.DisplayName</td>
-                            <td>@item.Created</td>
-                            <td>@item.LatestChange</td>
-                            <td>@item.Description</td>
-                            <td>@item.Status</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-        <div></div>
-    </div>*@
-
-
-<div class="container">
-    <EditForm Model="currentValue" OnSubmit="GetCasesOnSpecficRequestAsync">
-        <div class="row">
-            @*<div class="form-group col-6">
-                    <input type="text" class="form-control" placeholder="Specific Value" @bind="currentValue.ValueFromUser" required />
-                </div>*@
-            <div class="form-group col-6">
-                <select @bind="currentValue.RequestFromUser" required class="form-control">
-                    <option>--Select Request--</option>
-                    <option value="GetOnId">GetOnId</option>
-                    <option value="GetOnStatus">GetOnStatus</option>
-                    <option value="GetOnDate">GetOnDate</option>
-                </select>
-                <div id="adminCreateResponse"></div>
-            </div>
-            @if (currentValue.RequestFromUser == "GetOnId")
-            {
-                <div class="form-group col-6">
-                    <select @bind="currentValue.ValueFromUser" required class="form-control">
-                        <option>--Select Customer--</option>
-                        @if (customers != null)
-                        {
-                            foreach (var customer in customers)
+                @if (currentValue.RequestFromUser == "GetOnCustomer")
+                {
+                    <div class="form-group col-6">
+                        <select @bind="currentValue.ValueFromUser" required class="form-control">
+                            <option>--Select Customer--</option>
+                            @if (customers != null)
                             {
-                                <option value="@customer.Id">@customer.DisplayName</option>
+                                foreach (var customer in customers)
+                                {
+                                    <option value="@customer.Id">@customer.DisplayName</option>
+                                }
+
                             }
+                        </select>
 
-                        }
-                    </select>
+                    </div>
+                }
+                @if (currentValue.RequestFromUser == "GetOnStatus")
+                {
+                    <div class="form-group col-6">
+                        <select @bind="currentValue.ValueFromUser" required class="form-control">
+                            <option>--Select Status--</option>
+                            <option value="Not Started">Not Started</option>
+                            <option value="Ongoing">Ongoing</option>
+                            <option value="Completed">Completed</option>
+                        </select>
 
-                </div>
-            }
-            @if (currentValue.RequestFromUser == "GetOnStatus")
-            {
-                <div class="form-group col-6">
-                    <select @bind="currentValue.ValueFromUser" required class="form-control">
-                        <option>--Select Status--</option>
-                        <option value="Not Started">Not Started</option>
-                        <option value="Ongoing">Ongoing</option>
-                        <option value="Completed">Completed</option>
-                    </select>
+                    </div>
+                }
+                @if (currentValue.RequestFromUser == "GetOnDate")
+                {
+                    <div class="form-group col-6">
+                        <select @bind="currentValue.ValueFromUser" required class="form-control">
+                            <option>--Select SortingMethod--</option>
+                            <option value="Latest">Latest</option>
+                            <option value="Oldest">Oldest</option>
+                        </select>
 
-                </div>
-            }
-            @if (currentValue.RequestFromUser == "GetOnDate")
-            {
-                <div class="form-group col-6">
-                    <select @bind="currentValue.ValueFromUser" required class="form-control">
-                        <option>--Select SortingMethod--</option>
-                        <option value="Latest">Latest</option>
-                        <option value="Oldest">Oldest</option>
-                    </select>
+                    </div>
+                }
 
-                </div>
-            }
-            <button type="submit">Request Data From Api</button>
-        </div>
+            </div>
+            <button type="submit" class="btn btn-secondary mt-3 mb-3">Request Data From Api</button>
+            <div id="adminCreateResponse"></div>
+        </EditForm>
+    </div>
 
-    </EditForm>
 
     @if (caseModel == null)
     {
@@ -127,6 +66,7 @@
     }
     else
     {
+    <div class="container">
         <table class="table">
             <thead>
                 <tr>
@@ -156,6 +96,7 @@
                 }
             </tbody>
         </table>
+    </div>   
     }
 </div>
 
@@ -165,8 +106,6 @@
     private Request currentValue;
     private IEnumerable<CustomerModel> customers;
 
-
-
     protected override async Task OnInitializedAsync()
     {
         currentValue = new Request();
@@ -175,87 +114,86 @@
 
     private async Task GetCasesOnSpecficRequestAsync()
     {
-        //        await jsRuntime.InvokeVoidAsync(
-        //"exampleJsFunctions.displayMessage",
-        //"");
-
-
-
-
+        await jsRuntime.InvokeVoidAsync(
+            "exampleJsFunctions.displayMessage",
+            "");
 
         switch (currentValue.RequestFromUser)
         {
-            case "GetOnId":
-                int result;
-                var id = int.TryParse(currentValue.ValueFromUser, out result);
-                @if (id == true)
+        case "GetOnCustomer":
+            int result;
+            var id = int.TryParse(currentValue.ValueFromUser, out result);
+            @if (id == true)
+            {
+                var urlid = $"https://localhost:44384/api/Cases/getoncustomerid?id={currentValue.ValueFromUser}";
+                caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(urlid);
+                @if (caseModel.Count() == 0)
                 {
-
-                    var urlid = $"https://localhost:44384/api/Cases/getoncustomerid?id={currentValue.ValueFromUser}";
-                    caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>(urlid);
-                 
-                    break;
-                }
-                else
-                {
-
                     await jsRuntime.InvokeVoidAsync(
-                         "exampleJsFunctions.displayMessage",
-                         "Please select a id with numbers");
-
-                    break;
+                        "exampleJsFunctions.displayMessage",
+                        "This Customer is not involved in any cases!.");
                 }
+                break;
+            }
+            else
+            {
+                await jsRuntime.InvokeVoidAsync(
+                        "exampleJsFunctions.displayMessage",
+                        "Please select a customer");
 
+                break;
+            }
 
-
-
-                case "GetOnStatus":
-                    @if (currentValue.ValueFromUser == "Not Started" || currentValue.ValueFromUser == "Ongoing" || currentValue.ValueFromUser == "Completed")
-                    {
-                        caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getonstatus?status={currentValue.ValueFromUser}");
-                        break;
-                    }
-                    else
-                    {
-                        await jsRuntime.InvokeVoidAsync(
-                 "exampleJsFunctions.displayMessage",
-                 "Please type in one of these statuses.(Not Started, Ongoing, Completed)");
-
-                        break;
-                    }
-                    case "GetOnDate":
-                        @if (currentValue.ValueFromUser == "Oldest" || currentValue.ValueFromUser == "oldest" || currentValue.ValueFromUser == "Latest" || currentValue.ValueFromUser == "latest")
-                        {
-                            caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getondate?ordervalue={currentValue.ValueFromUser}");
-                            break;
-                        }
-                        else
-                        {
-                            await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"Please type in one of these datecommands.(Oldest/oldest, Latest/latest)");
-                            break;
-                        }
-
-
-
-                        default:
-                            {
-                                await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"Please select a Request");
-                                break;
-                            }
-
-                    }
-
-
-
-                }
-
-                public class Request
+        case "GetOnStatus":
+            @if (currentValue.ValueFromUser == "Not Started" || currentValue.ValueFromUser == "Ongoing" || currentValue.ValueFromUser == "Completed")
+            {
+                caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getonstatus?status={currentValue.ValueFromUser}");
+                @if (caseModel.Count() == 0)
                 {
-                    public string RequestFromUser { get; set; }
-                    public string ValueFromUser { get; set; }
+                    await jsRuntime.InvokeVoidAsync(
+                        "exampleJsFunctions.displayMessage",
+                        "The API returned a empty list.");
                 }
+                break;
+            }
+            else
+            {
+                await jsRuntime.InvokeVoidAsync(
+                        "exampleJsFunctions.displayMessage",
+                        "Please select a status.(Not Started, Ongoing, Completed)");
+                break;
+            }
+        case "GetOnDate":
+            @if (currentValue.ValueFromUser == "Oldest" || currentValue.ValueFromUser == "oldest" || currentValue.ValueFromUser == "Latest" || currentValue.ValueFromUser == "latest")
+            {
+                caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>($"https://localhost:44384/api/Cases/getondate?ordervalue={currentValue.ValueFromUser}");
+                @if (caseModel.Count() == 0)
+                {
+                    await jsRuntime.InvokeVoidAsync(
+                        "exampleJsFunctions.displayMessage",
+                        "The API returned a empty list.");
+                }
+                break;
+            }
+            else
+            {
+                await jsRuntime.InvokeVoidAsync(
+                    "exampleJsFunctions.displayMessage",
+                    "Please select a datecommand.");
+                break;
+            }
+        default:
+            {
+                await jsRuntime.InvokeVoidAsync(
+                    "exampleJsFunctions.displayMessage",
+                    "Please select a Request");
+                break;
+            }
+        }
+    }
+        public class Request
+        {
+            public string RequestFromUser { get; set; }
+            public string ValueFromUser { get; set; }
+        }
 }

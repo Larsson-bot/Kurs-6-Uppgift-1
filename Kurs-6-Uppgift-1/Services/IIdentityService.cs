@@ -22,9 +22,5 @@ namespace Kurs_6_Uppgift_1.Services
         Task<CustomerModel> GetSpecificCustomer(int id);
 
         Task<IEnumerable<Case>> GetNewStatusCases(string status);
-
-        //Task<IEnumerable<UserResponse>> GetUsersAsync();
-
-        bool ValidateAccessRights(RequestUser requestUser);
     }
 }

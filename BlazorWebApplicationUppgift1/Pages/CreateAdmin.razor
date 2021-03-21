@@ -4,7 +4,6 @@
     <h1 class="createheadline">Create Admin</h1>
     <EditForm Model="admin" OnValidSubmit="@CreateAdminAsync">
         <DataAnnotationsValidator />
-
         <div class="row g-3 mt-3">
             <div class="form-group col-6">
                 <input type="text" class="form-control" @bind="admin.FirstName" @ref="myref" placeholder="FirstName" />
@@ -49,18 +48,12 @@
             }
             else
             {
-
                 await jsRuntime.InvokeVoidAsync(
                 "exampleJsFunctions.displayMessage",
                 "Theres an Admin in this system already!");
             }
-
-
-
         }
-
       
-
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -69,7 +62,6 @@
             }
         }
 
-
         protected override void OnInitialized()
         {
             
@@ -77,6 +69,5 @@
 
 
         }
-
     }
 

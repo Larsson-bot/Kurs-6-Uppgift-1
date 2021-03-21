@@ -23,8 +23,6 @@ namespace Kurs_6_Uppgift_1.Services
             Configuration = configuration;
         }
 
-
-
         public async Task<bool> CreateUserAsync(SignUpModel model)
         {
             if(!_context.Users.Any(u => u.Email == model.Email))
@@ -71,7 +69,6 @@ namespace Kurs_6_Uppgift_1.Services
                 {
 
                 }
-   
             }
             return false;
         }
@@ -139,9 +136,7 @@ namespace Kurs_6_Uppgift_1.Services
                     {
                         if (user.ValidatePasswordHash(password))
                         {
-                            var tokenHandler = new JwtSecurityTokenHandler();
-
-                            
+                            var tokenHandler = new JwtSecurityTokenHandler();         
                             var expiresDate = DateTime.Now.AddHours(5);
 
                             var _secretKey = Encoding.UTF8.GetBytes(Configuration.GetSection("SecretKey").Value);
@@ -187,9 +182,6 @@ namespace Kurs_6_Uppgift_1.Services
         public async Task<bool> CreateCaseAsync(Case model)
         {
             var date = DateTime.Now;
-
-        
-
             try
             {
                 var errand = new Case
@@ -200,7 +192,6 @@ namespace Kurs_6_Uppgift_1.Services
                     LatestChange = new DateTime(date.Year, date.Month, date.Day, date.Hour, date.Minute, date.Second),
                     Status = "Not Started",
                     Description = model.Description
-
                 };
 
                 try
@@ -211,12 +202,10 @@ namespace Kurs_6_Uppgift_1.Services
                 }
                 catch
                 {
-
                 }
             }
             catch
             {
-            
             }
             return false;
         }
@@ -263,15 +252,7 @@ namespace Kurs_6_Uppgift_1.Services
             return customerwithcases;
         }
 
-        public bool ValidateAccessRights(RequestUser requestUser)
-        {
-            if (_context.Tokens.Any(u => u.AccessToken == requestUser.Token && u.UserId == requestUser.UserId))
-                 return true;
 
-            return false;
-
-
-        }
 
         public async Task<IEnumerable<Case>> GetNewStatusCases(string status)
         {
@@ -286,5 +267,5 @@ namespace Kurs_6_Uppgift_1.Services
             return list;
         }
     }
-    }
+}
 

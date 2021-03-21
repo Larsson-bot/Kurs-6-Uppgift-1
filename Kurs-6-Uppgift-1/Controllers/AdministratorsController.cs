@@ -26,17 +26,6 @@ namespace Kurs_6_Uppgift_1.Controllers
             _context = context;
         }
 
-        [HttpPost("create-customer")]
-        public async Task<IActionResult> CreateCustomer([FromBody] Customer model)
-        {
-            if (await _identityService.CreateCustomerAsync(model))
-                return new OkObjectResult("Customer has been created");
-
-            return new BadRequestObjectResult("Email already exists!");
-        }
-
-
-
         [AllowAnonymous]
         [HttpPost("signup")]
         public async Task<IActionResult> SignUp([FromBody] SignUpModel model)
@@ -45,12 +34,10 @@ namespace Kurs_6_Uppgift_1.Controllers
             {
                 return new UnauthorizedObjectResult("There can only be one Administrator");
             }
-
             if (await _identityService.CreateUserAsync(model))
             {
                 return new OkResult();
             }
-
             return new BadRequestResult();
         }
 
@@ -74,54 +61,5 @@ namespace Kurs_6_Uppgift_1.Controllers
 
             return new BadRequestObjectResult("Admin does not exist!");
         }
-
-
-
-
-        [AllowAnonymous]
-        [HttpGet("customer/{id}")]
-        public async Task<IActionResult> GetSpecificCustomer(int id)
-        {
-            if (_identityService.ValidateAccessRights(IdentityRequest()))
-            {
-                if (_context.Customers.Count() < id)
-                {
-                    return new BadRequestObjectResult("Customer does not exist");
-                }
-                else
-
-                    return new OkObjectResult(await _identityService.GetSpecificCustomer(id));
-            }
-            return new UnauthorizedObjectResult("Unauthorized!");
-      
-        }
-
-
-        private RequestUser IdentityRequest()
-        {
-            try
-            {
-                var user =  new RequestUser
-                {
-                    UserId = int.Parse(HttpContext.User.FindFirst("UserId").Value),
-                    Token = Request.Headers["Authorization"].ToString().Split(" ")[1]
-                };
-                return user;
-            }
-
-            catch
-            {
-               CatchMessage();
-            }
-            return new RequestUser();
-
-        }
-
-        private IActionResult CatchMessage()
-        {
-            return new NotFoundObjectResult("Wrong User or Token.");
-        }
-
-
     }
 }

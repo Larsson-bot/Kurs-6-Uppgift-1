@@ -29,19 +29,19 @@ tbody, td, tfoot, th, thead, tr {
     border-bottom-color: none !important;
 }
 
-/*html body {
-       background-color: rgba(42, 10, 71, 0.644); 
-}
-*/
 
 html body {
     background-color: rgba(155, 145, 204, 0.644);
 }
 
-input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, select:focus {
     outline: none;
-    box-shadow: 0 0 0 1px rgba(66, 68, 211, 0.507);
+    /*box-shadow: 0 0 0 1px rgba(66, 68, 211, 0.507);*/
+    box-shadow: 0 0 0 1px black;
     border-radius: 1px;
+}
+.logininput:focus {
+    box-shadow: 0 0 0 1px rgba(66, 68, 211, 0.507);
 }
 .customer-grid {
     display: grid;
@@ -72,4 +72,16 @@ table tr {
 
 .text-label{
     font-weight:700;
+}
+
+#adminCreateResponse {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.specficheader{
+    font-family: 'Quattrocento', serif;
+    font-weight: 700;
+    font-size: 40px;
+    margin-bottom: 10px;
 }

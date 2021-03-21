@@ -8,7 +8,6 @@
             <i class="fas fa-edit me-1 fa-2x"></i>
             <a class="navbar-brand me-4" href="#">CaseManager</a>
         </div>
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -26,8 +25,6 @@
                         <a class="nav-link" href="check">Create Customer</a>
                     </li>
                 }
-
-
                 @if (CaseView)
                 {
                     <li class="nav-item">
@@ -57,17 +54,11 @@
             }
             @if (AdminView)
             {
-
                 <div>Welcome @admin.FirstName!</div>
-
-
                 <span class="navbar-text">
                     <a class="nav-link" href="logout">Sign out</a>
                 </span>
-
-
             }
-
         </div>
     </div>
 </nav>
@@ -79,12 +70,9 @@
     private CreateAdminModel existadmin;
     private IEnumerable<CreateCaseModel> cases;
 
-
-
     public bool ShowLink { get; set; } = true;
 
     public bool AdminView { get; set; } = false;
-
 
     public bool CaseView { get; set; } = false;
 
@@ -93,9 +81,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         await TokenExistAsync();
-
     }
 
     private async Task TokenExistAsync()
@@ -109,16 +95,13 @@
             AdminView = true;
             await GetAdmin();
             await CheckIfCustomersExist();
+            await CheckIfCasesExist();
         }
 
     }
 
-
-
     private async Task GetAdmin()
     {
-
-
         @if (!Http.DefaultRequestHeaders.Any())
         {
 
@@ -143,10 +126,14 @@
         }
 
         customers = await Http.GetFromJsonAsync<IEnumerable<CustomerModel>>("https://localhost:44384/api/Customers");
-        @if (customers != null)
+        @if (customers.Any())
         {
             CaseView = true;
-            await CheckIfCasesExist();
+
+        }
+        else
+        {
+            CaseView = false;
         }
     }
 
@@ -161,9 +148,13 @@
         }
 
         cases = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
-        @if (cases != null)
+        @if (cases.Any())
         {
             CaseViewAll = true;
+        }
+        else
+        {
+            CaseViewAll = false;
         }
     }
 
