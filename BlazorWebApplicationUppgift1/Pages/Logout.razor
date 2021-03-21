@@ -4,7 +4,6 @@
 @code {      
     protected override async Task OnInitializedAsync()
     {
-
         await sessionStorage.RemoveItemAsync("AccessToken");
         NavManager.NavigateTo("/logoutpage", true);
     }

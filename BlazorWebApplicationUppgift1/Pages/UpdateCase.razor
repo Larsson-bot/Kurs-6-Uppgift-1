@@ -1,19 +1,12 @@
 ﻿@page "/update-case"
 
-<h3>Update Cases</h3>
-
-
-
+<h1 class="createheadline mb-3">Update Case</h1>
 @if (caseModel == null)
 {
     <p><em>Loading...</em></p>
 }
-
 else
 { 
-
-
-
 <table class="table">
     <tr>
         <th>CaseId</th>
@@ -38,16 +31,16 @@ else
                     @item.Customer.DisplayName
                 </td>
                 <td>
-                   @item.AdminstratorId
+                    @item.AdminstratorId
                 </td>
                 <td>
-                 @item.Description
+                    @item.Description
                 </td>
                 <td>
-                   @item.Created
+                    @item.Created
                 </td>
                 <td>
-                   @item.LatestChange
+                    @item.LatestChange
                 </td>
                 <td>
                     <select @bind="item.Status" required>
@@ -69,24 +62,22 @@ else
         }
         else
         {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Customer.DisplayName</td>
+                <td>@item.AdminstratorId</td>
+                <td>@item.Description</td>
+                <td>@item.Created</td>
+                <td>@item.LatestChange</td>
+                <td>@item.Status</td>
+                <td>
 
-<tr>
-    <td>@item.Id</td>
-    <td>@item.Customer.DisplayName</td>
-    <td>@item.AdminstratorId</td>
-    <td>@item.Description</td>
-    <td>@item.Created</td>
-    <td>@item.LatestChange</td>
-    <td>@item.Status</td>
-    <td>
-
-        <button type="button" class="btn btn-link" style="text-decoration: none" @onclick="() => EnableEditing(true, item)">
-            <i class="fas fa-pen" />
-        </button>
-    </td>
-</tr>
+                    <button type="button" class="btn btn-link" style="text-decoration: none" @onclick="() => EnableEditing(true, item)">
+                        <i class="fas fa-pen" />
+                    </button>
+                </td>
+            </tr>
         }
-
     }
 </table>
 }
@@ -100,13 +91,7 @@ else
 
     private async Task GetCasesAsync()
     {
-        //if (!Http.DefaultRequestHeaders.Any())
-        //{
-        //    Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-        //}
-
         caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
-
     }
 
     private async Task EnableEditing(bool flag, CreateCaseModel instanceData)
@@ -123,8 +108,5 @@ else
         await EnableEditing(false, instanceData);
         var response = await Http.PutAsJsonAsync<CreateCaseModel>($"https://localhost:44384/api/Cases/{instanceData.Id}", instanceData );
         caseModel = await Http.GetFromJsonAsync<IEnumerable<CreateCaseModel>>("https://localhost:44384/api/Cases");
-        Console.WriteLine(response);
-        //call the repository to update the instance here.
-        //show toast after done.
     }
 }

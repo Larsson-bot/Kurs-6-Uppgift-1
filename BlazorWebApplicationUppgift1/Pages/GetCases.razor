@@ -1,43 +1,46 @@
 ﻿@page "/get-cases"
 
-
-<h1>Cases</h1>
-@if (caseModel == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>CaseId</th>
-                <th>AdminId</th>
-                <th>CustomerId</th>
-                <th>Customer</th>
-                <th>Created</th>
-                <th>Last Changed</th>
-                <th>Description</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in caseModel)
-            {
+<div class="container">
+    <h1 class="headline">Cases</h1>
+    @if (caseModel == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@item.Id</td>
-                    <td>@item.AdminstratorId</td>
-                    <td>@item.CustomerId</td>
-                    <td>@item.Customer.DisplayName</td>
-                    <td>@item.Created</td>
-                    <td>@item.LatestChange</td>
-                    <td>@item.Description</td>
-                    <td>@item.Status</td>
+                    <th>CaseId</th>
+                    <th>AdminId</th>
+                    <th>CustomerId</th>
+                    <th>Customer</th>
+                    <th>Created</th>
+                    <th>Last Changed</th>
+                    <th>Description</th>
+                    <th>Status</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var item in caseModel)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.AdminstratorId</td>
+                        <td>@item.CustomerId</td>
+                        <td>@item.Customer.DisplayName</td>
+                        <td>@item.Created</td>
+                        <td>@item.LatestChange</td>
+                        <td>@item.Description</td>
+                        <td>@item.Status</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
+
 @code {
     private IEnumerable<CreateCaseModel> caseModel;
 

@@ -6,7 +6,6 @@
     protected override async Task OnInitializedAsync()
     {
         var key = await sessionStorage.GetItemAsync<string>("AccessToken");
-        Console.WriteLine(key);
         @if(key == null)
         {
             NavManager.NavigateTo("/login");

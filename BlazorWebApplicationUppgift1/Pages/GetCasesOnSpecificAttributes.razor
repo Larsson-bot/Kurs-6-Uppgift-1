@@ -1,6 +1,6 @@
 ﻿@page "/specfic-case"
 
-<h3>GetCasesOnSpecificAttributes</h3>
+<h1 class="createheadline">Get Cases On Specific Attributes</h1>
 @*<div class="container">
         <EditForm Model="currentValue" OnSubmit="GetCasesOnSpecficRequestAsync">
             <div class="row">
@@ -175,13 +175,13 @@
 
     private async Task GetCasesOnSpecficRequestAsync()
     {
-        await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"");
+        //        await jsRuntime.InvokeVoidAsync(
+        //"exampleJsFunctions.displayMessage",
+        //"");
 
 
 
-  
+
 
         switch (currentValue.RequestFromUser)
         {

@@ -30,9 +30,9 @@ namespace Kurs_6_Uppgift_1.Controllers
         public async Task<IActionResult> CreateCustomer([FromBody] Customer model)
         {
             if (await _identityService.CreateCustomerAsync(model))
-                return new OkResult();
+                return new OkObjectResult("Customer has been created");
 
-            return new BadRequestResult();
+            return new BadRequestObjectResult("Email already exists!");
         }
 
 

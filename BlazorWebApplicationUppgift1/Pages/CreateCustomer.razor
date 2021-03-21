@@ -2,7 +2,7 @@
 
 <div class="container mt-5">
     <div class="d-flex justify-content-start ms-4">
-        <h3>Create Customer</h3>
+        <h1 class="createheadline">Create Customer</h1>
     </div>
     <div class="customer-grid p-5">
         <div class="col-8">
@@ -17,7 +17,7 @@
                     <label for="floatingLname">LastName</label>
                 </div>
                 <div class="form-floating row mb-3">
-                    <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com">
+                    <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com" required @bind="customer.Email" >
                     <label for="floatingEmail">Email address</label>
                 </div>
                 <div class="row">
@@ -78,22 +78,39 @@
     private CustomerModel customer;
     private IEnumerable<CustomerModel> customers;
     private ElementReference myref;
+
     private async Task CreateNewCustomer()
     {
-        if (!Http.DefaultRequestHeaders.Any())
-        {
-            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-        }
-        var response = await Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Administrators/create-customer", customer);
-        customer = new CustomerModel();
-        await GetCustomers();
-        await jsRuntime.InvokeVoidAsync(
-"exampleJsFunctions.displayMessage",
-"Customer has been created");
-        await Task.Delay(2000);
+
         await jsRuntime.InvokeVoidAsync(
 "exampleJsFunctions.displayMessage",
 "");
+
+        var response = await Http.PostAsJsonAsync<CustomerModel>("https://localhost:44384/api/Administrators/create-customer", customer);
+
+
+
+        @if (response.IsSuccessStatusCode)
+        {
+            customer = new CustomerModel();
+            await GetCustomers();
+            await jsRuntime.InvokeVoidAsync(
+    "exampleJsFunctions.displayMessage",
+    "Customer has been created");
+            await Task.Delay(2000);
+            await jsRuntime.InvokeVoidAsync(
+    "exampleJsFunctions.displayMessage",
+    "");
+        }
+
+        else
+        {
+            await jsRuntime.InvokeVoidAsync(
+"exampleJsFunctions.displayMessage",
+"Email already exists in database! Please choose another.");
+        }
+
+       
     }
 
     private async Task GetCustomers()
@@ -103,14 +120,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (!Http.DefaultRequestHeaders.Any())
-        {
-            Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {await sessionStorage.GetItemAsync<string>("AccessToken")}");
-        }
-
         customer = new CustomerModel();
         await GetCustomers();
-
     }
 
 

@@ -1,25 +1,30 @@
 ﻿@page "/create-admin"
 
 <div class="container">
-    <h3>Create Admin</h3>
+    <h1 class="createheadline">Create Admin</h1>
     <EditForm Model="admin" OnValidSubmit="@CreateAdminAsync">
         <DataAnnotationsValidator />
-        <ValidationSummary />
+
         <div class="row g-3 mt-3">
             <div class="form-group col-6">
                 <input type="text" class="form-control" @bind="admin.FirstName" @ref="myref" placeholder="FirstName" />
+                <ValidationMessage For="() => admin.FirstName" />
             </div>
             <div class="form-group col-6">
                 <input type="text" class="form-control" @bind="admin.LastName" placeholder="LastName" />
+                <ValidationMessage For="() => admin.LastName" />
             </div>
             <div class="form-group col-12">
                 <input type="email" class="form-control" @bind="admin.Email" placeholder="Email" />
+                <ValidationMessage For="() => admin.Email" />
             </div>
             <div class="form-group col-6">
                 <input type="password" class="form-control" @bind="admin.Password" placeholder="Password" />
+                <ValidationMessage For="() => admin.Password" />
             </div>
             <div class="form-group col-6">
                 <input type="password" class="form-control" @bind="admin.ConfirmPassword" placeholder="Confirm Password" />
+                <ValidationMessage For="() => admin.ConfirmPassword" />
             </div>
             <button type="submit" class="btn btn-success">Create Admin</button>
             <div id="adminCreateResponse"></div>
